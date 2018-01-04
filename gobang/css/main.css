@@ -1,41 +1,64 @@
-*{
-    margin:0;
-    padding:0;
-}
-
-.body{
-    background-color: #009800;
+html,body{
+    margin: 0;
+    height: 100%;
 }
 
 .header{
-    margin: 30px auto;
+    /*margin: 20px 0;*/
     text-align: center;
+    background: coral;
 }
 
-#main{
-    margin: 0 auto;
+h1{
+    margin: 0;
+    background: coral;
+}
+
+#cb{
+    margin: auto auto;
     /*width: 640px;*/
     /*height: 640px;*/
     border: 1px solid black;
     display: block;
 }
 
-.gobang{
-    margin: 10px auto;
-    /*width:642px;*/
-    /*height: 642px;*/
+.main{
+    height: 100%;
+    /*width: 800px;*/
+    margin: 0 400px;
     /*border:1px solid #7a7a7a;*/
     /*background: url(../images/bak.jpg);*/
-    overflow: hidden;
+    background: #009800;
+    /*overflow: hidden;*/
+}
+
+.clearcb{
+    margin: 200px 200px 200px 200px;
+    width: 100px;
+    height: 50px;
+}
+
+.navleft,.navright{
+    width: 400px;
+    height: 100%;
+    background: chartreuse;
+}
+
+.navleft{
+    float: left;
+}
+
+.navright{
+    float: right;
 }
 
 .statusbar{
-    margin: 0 auto;
+    margin: 200px auto;
     width: 100px;
     height: 40px;
     text-align: center;
     color: #f00;
-    border: 5px solid red;
+    border: 2px solid red;
     line-height: 40px;
     display: block;
 }
