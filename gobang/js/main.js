@@ -16,16 +16,17 @@ black.src = "images/black.png";
 white.src = "images/white.png";
 
 /*棋盘初始化*/
-var canvasOfMain = document.getElementById('cb');
+var canvasOfMain = document.getElementById('chessboard');
 var ctxOfMain = canvasOfMain.getContext("2d");  //获取该canvas的2D绘图环境对象
 ctxOfMain.strokeStyle = "#333";
 
 //下面这四行绘制正方形，对于15X15的棋盘，横竖绘制14个正方形即可
 for(var m = 0; m < cbArray.length - 1; m++){
     for(var n = 0; n < cbArray.length - 1; n++){
-        ctxOfMain.strokeRect(m*40+40, n*40+40, 40, 40);  //绘制40的小正方形
+        ctxOfMain.strokeRect(m*40+40, n*40+40, 40, 40);  //绘制40像素的正方形
     }
 }
+fivePoint();//绘制棋盘上的五个点
 
 /*棋盘状态标志位*/
 var isBlack = true; //当前棋子是否为黑色
@@ -38,13 +39,12 @@ var ctxOfStatusBar = canvasOfStatusBar[0].getContext("2d");
 ctxOfStatusBar.beginPath();
 ctxOfStatusBar.font=("100px Georgia");
 ctxOfStatusBar.fillStyle="#F70707";
-//ctxOfStatusBar.fillText("Hello",40,100);
 
 /*点击棋盘开始下棋*/
-canvasOfMain.onclick = function play(e){
+canvasOfMain.onclick = function click(e){
     console.log("鼠标点击的坐标(" + e.clientX + "," + e.clientY + ")");
 
-    if( isGameOver == false ){
+    if( isGameOver === false ){
         //获取棋盘相对外边框左边和顶边的偏移量，即确定棋盘左上角那个点的坐标
         var l = this.offsetLeft + 40;
         var t = this.offsetTop + 40;
@@ -58,44 +58,43 @@ canvasOfMain.onclick = function play(e){
         //确定棋子二维数组坐标，左上角为(0,0)，右下角为(14,14)
         if( x > 0 ){
             if( x % 40 < 20 ){
-                col = parseInt(x/40);
+                row = parseInt(x/40);
             }else{
-                col = parseInt(x/40)+1;
+                row = parseInt(x/40)+1;
             }
         }
 
         if( y > 0 ){
             if( y % 40 < 20 ){
-                row = parseInt(y/40);
+                col = parseInt(y/40);
             }else{
-                row = parseInt(y/40)+1;
+                col = parseInt(y/40)+1;
             }
         }
 
-        console.log("棋盘坐标(" + col + "," + row + ")");
-
-        if( cbArray[row][col] === 0 ){
-            if(isBlack){//下黑子
-                ctxOfMain.drawImage(black, col*40+22, row*40+22);//理论上是加20，这里加22属于微调，让棋子摆在正中央
-                isBlack = false;
-                cbArray[row][col] = 1; //黑子为1
-                check(1, row, col);
-            }else{
-                ctxOfMain.drawImage(white, col*40+22, row*40+22);
-                isBlack = true;
-                cbArray[row][col] = 2; //白子为2
-                check(2, row, col);
-            }
-        }
+        console.log("棋盘坐标(" + row + "," + col + ")");
+        drop(col, row); //棋盘横竖和二维数组的行列需要反一下
     }else{
-        if(confirm("本局已经结束，要重新开局吗？")){
-            clearCb();
-            ctxOfStatusBar.clearRect(0, 0, canvasOfStatusBar[0].width, canvasOfStatusBar[0].height);
-        }else{
-
-        }
+       toast("比赛结束，请点击重新开始！");
     }
 };
+
+/*落子*/
+function drop(row, col){
+    if( cbArray[row][col] === 0 ){
+        if(isBlack){//下黑子
+            ctxOfMain.drawImage(black, col*40+22, row*40+22);//理论上是加20，这里加22属于微调，让棋子摆在正中央
+            isBlack = false;
+            cbArray[row][col] = 1; //黑子为1
+            check(1, row, col);
+        }else{
+            ctxOfMain.drawImage(white, col*40+22, row*40+22);
+            isBlack = true;
+            cbArray[row][col] = 2; //白子为2
+            check(2, row, col);
+        }
+    }
+}
 
 /*判断棋局是否结束*/
 function check(color, row, col){
@@ -169,12 +168,14 @@ function check(color, row, col){
                 ctxOfStatusBar.clearRect(0, 0, canvasOfStatusBar[0].width, canvasOfStatusBar[0].height);
                 ctxOfStatusBar.fillText("黑子赢", 0, 100);
                 isGameOver = true;
+                // toast("比赛结束，黑子获胜！");
             }else{
                 // alert("白子赢");
                 // canvasOfStatusBar[0].innerHTML="白子赢";
                 ctxOfStatusBar.clearRect(0, 0, canvasOfStatusBar[0].width, canvasOfStatusBar[0].height);
                 ctxOfStatusBar.fillText("白子赢", 0, 100);
                 isGameOver = true;
+                // toast("比赛结束，白子获胜！");
             }
         }
     }
@@ -188,7 +189,7 @@ function check(color, row, col){
 }
 
 /*清空棋盘*/
-function clearCb(){
+function clearChessBoard(){
      for(var i = 0; i < cbArray.length; i++){
         for(var j = 0;j < cbArray.length; j++){
             if( cbArray[i][j] !== 0 ) {
@@ -204,8 +205,30 @@ function clearCb(){
             ctxOfMain.strokeRect(m*40+40, n*40+40, 40, 40);
         }
     }
+    fivePoint();
 
     ctxOfStatusBar.clearRect(0, 0, canvasOfStatusBar[0].width, canvasOfStatusBar[0].height);
     isGameOver = false;
     isBlack = true;
+}
+
+/*绘制棋盘上的五个点*/
+function fivePoint(){
+    ctxOfMain.fillRect(3*40+37, 3*40+37, 6, 6);
+    ctxOfMain.fillRect(3*40+37, 11*40+37, 6, 6);
+    ctxOfMain.fillRect(11*40+37, 3*40+37, 6, 6);
+    ctxOfMain.fillRect(7*40+37, 7*40+37, 6, 6);
+    ctxOfMain.fillRect(11*40+37, 11*40+37, 6, 6);
+}
+
+/*toast提示*/
+function toast(msg){
+    setTimeout(function(){
+        document.getElementsByClassName('toast-wrap')[0].getElementsByClassName('toast-msg')[0].innerHTML=msg;
+        var toastTag = document.getElementsByClassName('toast-wrap')[0];
+        toastTag.className = toastTag.className.replace('toastAnimate','');
+        setTimeout(function(){
+            toastTag.className = toastTag.className + ' toastAnimate';
+        }, 100);
+    },500);
 }

@@ -9,15 +9,50 @@ html,body{
     background: coral;
 }
 
-h1{
-    margin: 0;
-    background: coral;
+.index-body{
+    background: #ffd53e;
 }
 
-#cb{
+#new-game{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    /*background-color: #ffffff;*/
+    width:  50%;
+    height: 50%;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    border: 1px solid black;
+}
+
+.select-mode{
+    font-size: x-large;
+    text-align: center;
+}
+
+.pvp{
+    margin: 20px auto;
+    text-align: center;
+}
+
+.pve{
+    margin: 20px auto;
+    text-align: center;
+}
+
+.button-pvp{
+    width: 150px;
+    height: 50px;
+    font-size: x-large;
+}
+
+.button-pve{
+    width: 150px;
+    height: 50px;
+    font-size: x-large;
+}
+
+#chessboard{
     margin: auto;
-    /*width: 640px;*/
-    /*height: 640px;*/
     border: 1px solid black;
     display: block;
 }
@@ -25,24 +60,54 @@ h1{
 .main{
     height: 100%;
     /*width: 800px;*/
-    margin: 0 0 0 200px;
+    margin: 0 200px;
     /*border:1px solid #7a7a7a;*/
     /*background: url(../images/bak.jpg);*/
-    background: #009800;
+    background: #ffb12b;
     /*overflow: hidden;*/
 }
 
-.clearcb{
-    margin: 100px 50px;
+.clearchessboard{
+    font-size: large;
+    margin: 10px 50px;
     width: 100px;
     height: 50px;
 }
 
-.nav{
+.homepage{
+    font-size: large;
+    margin: 10px 50px;
+    width: 100px;
+    height: 50px;
+}
+
+.setting-body{
+    background: #ffd53e;
+}
+
+.pve-setting{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    /*background-color: #ffffff;*/
+    width:  50%;
+    height: 50%;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    border: 1px solid black;
+}
+
+.navleft,.navright{
     width: 200px;
     height: 100%;
-    background: chartreuse;
+    background: #d851ff;
+}
+
+.navleft{
     float: left;
+}
+
+.navright{
+    float: right;
 }
 
 .statusbar{
@@ -54,4 +119,28 @@ h1{
     border: 2px solid red;
     line-height: 40px;
     display: block;
+}
+
+.toast-wrap{
+    opacity: 0;
+    position: fixed;
+    bottom: 7%;
+    color: #fff;
+    width: 100%;
+    text-align: center;
+}
+.toast-msg{
+    background-color: rgba(0,0,0,0.7);
+    padding: 2px 5px;
+    border-radius: 5px;
+}
+.toastAnimate{
+    animation: toastKF 2s;
+}
+@keyframes toastKF{
+    0% {opacity: 0;}
+    25% {opacity: 1; z-index: 9999}
+    50% {opacity: 1; z-index: 9999}
+    75% {opacity: 1; z-index: 9999}
+    100% {opacity: 0; z-index: 0}
 }
