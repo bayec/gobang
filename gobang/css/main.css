@@ -7,19 +7,21 @@
     background-color: #009800;
 }
 
-.head{
-    margin:30px auto;
+.header{
+    margin: 30px auto;
     text-align: center;
 }
 
-#can{
-    margin:0px auto;
-    border:1px solid black;
+#main{
+    margin: 0 auto;
+    /*width: 640px;*/
+    /*height: 640px;*/
+    border: 1px solid black;
     display: block;
 }
 
 .gobang{
-    margin:10px auto;
+    margin: 10px auto;
     /*width:642px;*/
     /*height: 642px;*/
     /*border:1px solid #7a7a7a;*/
@@ -27,13 +29,13 @@
     overflow: hidden;
 }
 
-.text{
-    margin:0 auto;
-    width:100px;
-    height:40px;
+.statusbar{
+    margin: 0 auto;
+    width: 100px;
+    height: 40px;
     text-align: center;
-    color:#f00;
-    border:5px solid red;
+    color: #f00;
+    border: 5px solid red;
     line-height: 40px;
     display: block;
 }
