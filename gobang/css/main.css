@@ -15,7 +15,7 @@ h1{
 }
 
 #cb{
-    margin: auto auto;
+    margin: auto;
     /*width: 640px;*/
     /*height: 640px;*/
     border: 1px solid black;
@@ -25,7 +25,7 @@ h1{
 .main{
     height: 100%;
     /*width: 800px;*/
-    margin: 0 400px;
+    margin: 0 0 0 200px;
     /*border:1px solid #7a7a7a;*/
     /*background: url(../images/bak.jpg);*/
     background: #009800;
@@ -33,29 +33,22 @@ h1{
 }
 
 .clearcb{
-    margin: 200px 200px 200px 200px;
+    margin: 100px 50px;
     width: 100px;
     height: 50px;
 }
 
-.navleft,.navright{
-    width: 400px;
+.nav{
+    width: 200px;
     height: 100%;
     background: chartreuse;
-}
-
-.navleft{
     float: left;
-}
-
-.navright{
-    float: right;
 }
 
 .statusbar{
     margin: 200px auto;
     width: 100px;
-    height: 40px;
+    height: 50px;
     text-align: center;
     color: #f00;
     border: 2px solid red;
