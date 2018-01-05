@@ -442,7 +442,7 @@ function sw_pve_xmlhttp_callback() {
     if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
         console.log("Text" + ":" + xmlhttp.responseText);
         var pos = xmlhttp.responseText.split("#");
-        drop(pos[1], pos[0], "Computer");
+        drop(parseInt(pos[1]), parseInt(pos[0]), "Computer");
     }
     else
         console.log("state=" + xmlhttp.status);
