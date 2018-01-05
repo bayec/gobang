@@ -364,3 +364,43 @@ function selectColor() {
         }
     }
 }
+
+var xmlhttp = null;
+function sw_pve_xmlhttp_send(data)
+{
+    console.log(data);
+    var cgi = "/cgi-bin/gobang";
+    //创建XMLHTTPRequest对象
+    if (window.XMLHttpRequest)
+    {// code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp=new XMLHttpRequest();
+        //针对某些特定版本的mozillar浏览器的bug进行修正。
+        if (xmlhttp.overrideMimeType) {
+            xmlhttp.overrideMimeType('text/xml');
+        }
+    }
+    else
+    {// code for IE6, IE5
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    //注册回调函数
+    xmlhttp.onreadystatechange = sw_pve_xmlhttp_callback;
+
+    xmlhttp.open("POST",cgi,true);
+    xmlhttp.setRequestHeader("If-Modified-Since", "0");
+    xmlhttp.send(data);
+}
+
+function sw_pve_xmlhttp_callback()
+{
+
+    //判断对象状态是交互完成，接收服务器返回的数据
+    if (xmlhttp.readyState==4 && xmlhttp.status==200)
+    {
+        console.log("Text"+":"+xmlhttp.responseText);
+        var pos = xmlhttp.responseText.split("#");
+        drop(pos[1], pos[0]);
+    }
+    else
+        console.log("state="+ xmlhttp.status);
+}
