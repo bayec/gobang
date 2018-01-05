@@ -46,46 +46,61 @@ html,body{
     font-size: x-large;
 }
 
-#chessboard{
-    margin: auto;
-    border: 1px solid black;
-    display: block;
-}
-
 .main{
     height: 100%;
     /*width: 800px;*/
-    margin: 0 200px;
-    /*border:1px solid #7a7a7a;*/
+    margin: 0 300px;
+    /*border: 20px solid #7a7a7a;*/
     /*background: url(../images/bak.jpg);*/
     background: #ffb12b;
     /*overflow: hidden;*/
 }
 
+.navleft,.navright{
+    width: 300px;
+    height: 100%;
+    background: #ffb12b;
+}
+
+.navleft{
+    float: left;
+}
+
+.navright{
+    float: right;
+    position: relative;
+}
+
+#chessboard{
+    margin: auto;
+    border: 3px solid black;
+    display: block;
+}
+
 .restart{
     font-size: large;
-    margin: 20px 40px;
+    margin: 40px 0 20px 180px;
     width: 120px;
     height: 50px;
 }
 
 .revoke{
     font-size: large;
-    margin: 20px 40px;
+    margin: 20px 0 20px 180px;
     width: 120px;
     height: 50px;
 }
 
 .giveup{
     font-size: large;
-    margin: 20px 40px;
+    margin: 20px 0 20px 180px;
     width: 120px;
     height: 50px;
 }
 
 .homepage{
     font-size: large;
-    margin: 20px 40px;
+    margin: 20px 0 20px 180px;
     width: 120px;
     height: 50px;
 }
@@ -106,51 +121,19 @@ html,body{
     border: 1px solid black;
 }
 
-.navleft,.navright{
-    width: 200px;
-    height: 100%;
-    background: #d851ff;
-}
-
-.navleft{
-    float: left;
-}
-
-.navright{
-    float: right;
-}
-
 .statusbar{
-    margin: 200px auto;
-    width: 100px;
-    height: 50px;
-    text-align: center;
-    color: #f00;
-    border: 2px solid red;
-    line-height: 40px;
+    /*margin: auto;*/
+    position: absolute;
+    top: 50%;
+    left: 0%;
+    width: 36px;
+    height: 36px;
+    /*text-align: center;*/
+    /*color: #f00;*/
+    /*border: 1px solid;*/
+    /*line-height: 40px;*/
     display: block;
-}
-
-.toast-wrap{
-    opacity: 0;
-    position: fixed;
-    bottom: 7%;
-    color: #fff;
-    width: 100%;
-    text-align: center;
-}
-.toast-msg{
-    background-color: rgba(0,0,0,0.7);
-    padding: 2px 5px;
-    border-radius: 5px;
-}
-.toastAnimate{
-    animation: toastKF 2s;
-}
-@keyframes toastKF{
-    0% {opacity: 0;}
-    25% {opacity: 1; z-index: 9999}
-    50% {opacity: 1; z-index: 9999}
-    75% {opacity: 1; z-index: 9999}
-    100% {opacity: 0; z-index: 0}
+    /*background: url("../images/black.png");*/
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
 }

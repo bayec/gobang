@@ -22,8 +22,11 @@ var canvasOfMain = document.getElementById('chessboard');
 var ctxOfMain = canvasOfMain.getContext("2d");  //获取该canvas的2D绘图环境对象
 ctxOfMain.strokeStyle = "#333";
 drawChessboard(ctxOfMain);
+document.getElementById("statusbar").style.backgroundImage = "url(./images/black.png)";
+layer.tips('轮到黑子走了！', '#statusbar');
 
 /*棋盘状态标志位*/
+var isPvp = true;   //记录当前游戏模式
 var isBlack = true; //当前棋子是否为黑色
 var isGameOver = false; //当前局是否结束
 var hasPiece = 0; //当前棋盘有几颗棋子
@@ -121,7 +124,7 @@ canvasOfMain.onclick = function click(e) {
         console.log("棋盘坐标(" + row + "," + col + ")");
         drop(col, row); //棋盘横竖和二维数组的行列需要反一下
     } else {
-        toast("比赛结束，请点击重新开始！");
+        layer.msg('比赛结束，请点击重新开始！');
     }
 };
 
@@ -129,16 +132,17 @@ canvasOfMain.onclick = function click(e) {
 function drop(row, col) {
     if (curCbArray[row][col] === 0) {
         if (isBlack) {//下黑子
-
-            ctxOfMain.drawImage(black, col * 36 + 18, row * 36 + 18);//理论上是加20，这里加22属于微调，让棋子摆在正中央
+            ctxOfMain.drawImage(black, col * 36 + 18, row * 36 + 18);
+            document.getElementById("statusbar").style.backgroundImage = "url(./images/white.png)";
+            layer.tips('轮到白子走了！', '#statusbar');
             isBlack = false;
             hasPiece++;
             revokeFlag++;
-            if( revokeFlag >= 2 ){
+            if (revokeFlag >= 2) {
                 var button_revoke1 = document.getElementById('revoke');
                 button_revoke1.disabled = false;
             }
-            if( hasPiece >= 2){
+            if (hasPiece >= 2) {
                 var button_giveup1 = document.getElementById('giveup');
                 button_giveup1.disabled = false;
             }
@@ -147,16 +151,17 @@ function drop(row, col) {
             curCbArray[row][col] = 1; //黑子为1
             check(1, row, col);
         } else {
-
             ctxOfMain.drawImage(white, col * 36 + 18, row * 36 + 18);
+            document.getElementById("statusbar").style.backgroundImage = "url(./images/black.png)";
+            layer.tips('轮到黑子走了！', '#statusbar');
             isBlack = true;
             hasPiece++;
             revokeFlag++;
-            if( revokeFlag >= 2 ){
+            if (revokeFlag >= 2) {
                 var button_revoke2 = document.getElementById('revoke');
                 button_revoke2.disabled = false;
             }
-            if( hasPiece >= 2){
+            if (hasPiece >= 2) {
                 var button_giveup2 = document.getElementById('giveup');
                 button_giveup2.disabled = false;
             }
@@ -235,19 +240,17 @@ function check(color, row, col) {
     function isWin() {
         if (total >= 5) {
             if (color === 1) {
-                // alert("黑子赢");
                 // canvasOfStatusBar[0].innerHTML="黑子赢";
                 ctxOfStatusBar.clearRect(0, 0, canvasOfStatusBar[0].width, canvasOfStatusBar[0].height);
-                ctxOfStatusBar.fillText("黑子赢", 0, 100);
+                // ctxOfStatusBar.fillText("黑子赢", 0, 100);
                 isGameOver = true;
-                // toast("比赛结束，黑子获胜！");
+                layer.msg('黑子获胜!');
             } else {
-                // alert("白子赢");
                 // canvasOfStatusBar[0].innerHTML="白子赢";
                 ctxOfStatusBar.clearRect(0, 0, canvasOfStatusBar[0].width, canvasOfStatusBar[0].height);
-                ctxOfStatusBar.fillText("白子赢", 0, 100);
+                // ctxOfStatusBar.fillText("白子赢", 0, 100);
                 isGameOver = true;
-                // toast("比赛结束，白子获胜！");
+                layer.msg('白子获胜!');
             }
         }
     }
@@ -280,7 +283,16 @@ function restart() {
     ctxOfMain.clearRect(0, 0, 640, 640);
     drawChessboard(ctxOfMain);
 
+    //禁用悔棋和认输
+    var buttonRevoke = document.getElementById('revoke');
+    buttonRevoke.disabled = true;
+
+    var buttonGiveup = document.getElementById('giveup');
+    buttonGiveup.disabled = true;
+
     ctxOfStatusBar.clearRect(0, 0, canvasOfStatusBar[0].width, canvasOfStatusBar[0].height);
+    document.getElementById("statusbar").style.backgroundImage = "url(./images/black.png)";
+    layer.tips('轮到黑子走了！', '#statusbar');
     isGameOver = false;
     isBlack = true;
     hasPiece = 0;
@@ -294,14 +306,14 @@ function revoke() {
 
     //重新摆子
     for (var i = 0; i < 15; i++) {
-       for (var j = 0; j < 15; j++) {
-           if( llastCbArray[i][j] === 1 ){
-               ctxOfMain.drawImage(black, j * 36 + 18, i * 36 + 18);
-           }else if( llastCbArray[i][j] === 2 ) {
-               ctxOfMain.drawImage(white, j * 36 + 18, i * 36 + 18);
-           }
-       }
-   }
+        for (var j = 0; j < 15; j++) {
+            if (llastCbArray[i][j] === 1) {
+                ctxOfMain.drawImage(black, j * 36 + 18, i * 36 + 18);
+            } else if (llastCbArray[i][j] === 2) {
+                ctxOfMain.drawImage(white, j * 36 + 18, i * 36 + 18);
+            }
+        }
+    }
 
     /*回退当前棋盘状态，清空前两次棋盘状态*/
     arrayCopy(curCbArray, llastCbArray);
@@ -309,50 +321,34 @@ function revoke() {
     arrayReset(lastCbArray);
 
     /*减两颗棋子*/
-    if( hasPiece <= 1 ){
+    if (hasPiece <= 1) {
         isBlack = true;
         hasPiece = 0;
-    }else if( hasPiece >= 2 ){
+    } else if (hasPiece >= 2) {
         hasPiece -= 2;
     }
 
     revokeFlag = 0;
 
-    /*悔棋按钮禁止按，因为只能悔一步*/
+    /*悔棋按一次后禁止再按，因为只能悔一步，需要等悔完以后再下两步使能按钮*/
     var button = document.getElementById('revoke');
     button.disabled = true;
 }
 
 function giveup() {
-    if( isBlack ){
-        ctxOfStatusBar.clearRect(0, 0, canvasOfStatusBar[0].width, canvasOfStatusBar[0].height);
-        ctxOfStatusBar.fillText("白子赢", 0, 100);
-        if( confirm("黑子认输，白子获胜!要重新开始一局吗？") ){
-            restart();
-        }else{
-            isGameOver = true;
-        }
-    }else {
-        ctxOfStatusBar.clearRect(0, 0, canvasOfStatusBar[0].width, canvasOfStatusBar[0].height);
-        ctxOfStatusBar.fillText("黑子赢", 0, 100);
-        if( confirm("白子认输，黑子获胜!要重新开始一局吗？") ){
-            restart();
-        }else{
-            isGameOver = true;
-        }
+    if (isBlack) {
+        layer.msg('黑子认输，白子获胜！');
+    } else {
+        layer.msg('白子认输，黑子获胜！');
     }
-}
+    isGameOver = true;
 
-/*toast提示*/
-function toast(msg) {
-    setTimeout(function () {
-        document.getElementsByClassName('toast-wrap')[0].getElementsByClassName('toast-msg')[0].innerHTML = msg;
-        var toastTag = document.getElementsByClassName('toast-wrap')[0];
-        toastTag.className = toastTag.className.replace('toastAnimate', '');
-        setTimeout(function () {
-            toastTag.className = toastTag.className + ' toastAnimate';
-        }, 100);
-    }, 500);
+    //禁用悔棋和认输
+    var buttonRevoke = document.getElementById('revoke');
+    buttonRevoke.disabled = true;
+
+    var buttonGiveup = document.getElementById('giveup');
+    buttonGiveup.disabled = true;
 }
 
 /*人机模式下判断用户选择的是黑子还是白子*/
@@ -360,47 +356,44 @@ function selectColor() {
     var radio = document.getElementsByName("radio-color");
     for (var i = 0; i < radio.length; i++) {
         if (radio[i].checked) {
-            //TODO
+            if (radio[i].value === "black") {
+
+            }
         }
     }
 }
 
 var xmlhttp = null;
-function sw_pve_xmlhttp_send(data)
-{
+
+function sw_pve_xmlhttp_send(data) {
     console.log(data);
     var cgi = "/cgi-bin/gobang";
     //创建XMLHTTPRequest对象
-    if (window.XMLHttpRequest)
-    {// code for IE7+, Firefox, Chrome, Opera, Safari
-        xmlhttp=new XMLHttpRequest();
+    if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp = new XMLHttpRequest();
         //针对某些特定版本的mozillar浏览器的bug进行修正。
         if (xmlhttp.overrideMimeType) {
             xmlhttp.overrideMimeType('text/xml');
         }
     }
-    else
-    {// code for IE6, IE5
-        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    else {// code for IE6, IE5
+        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
     }
     //注册回调函数
     xmlhttp.onreadystatechange = sw_pve_xmlhttp_callback;
 
-    xmlhttp.open("POST",cgi,true);
+    xmlhttp.open("POST", cgi, true);
     xmlhttp.setRequestHeader("If-Modified-Since", "0");
     xmlhttp.send(data);
 }
 
-function sw_pve_xmlhttp_callback()
-{
-
+function sw_pve_xmlhttp_callback() {
     //判断对象状态是交互完成，接收服务器返回的数据
-    if (xmlhttp.readyState==4 && xmlhttp.status==200)
-    {
-        console.log("Text"+":"+xmlhttp.responseText);
+    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        console.log("Text" + ":" + xmlhttp.responseText);
         var pos = xmlhttp.responseText.split("#");
         drop(pos[1], pos[0]);
     }
     else
-        console.log("state="+ xmlhttp.status);
+        console.log("state=" + xmlhttp.status);
 }
