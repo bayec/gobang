@@ -6,17 +6,17 @@
     <link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
 <body>
-<div class="header">
-    <h1>五子棋</h1>
-</div>
 <div class="navleft">
-    <button class="clearchessboard" onclick="clearChessBoard()">重新开始</button>
+    <button class="restart" onclick="restart()">重新开始</button>
+    <button class="revoke" onclick="revoke()">悔棋(TODO)</button>
     <a href="index.html"><button class="homepage">返回首页</button></a>
     <canvas class="statusbar">Your browser does not support the HTML5 canvas tag.</canvas>
 </div>
 <div class="navright">
 </div>
 <div class="main">
+    <br>
+    <h1>五子棋</h1>
     <canvas id="chessboard" width="640" height="640">Your browser does not support the HTML5 canvas tag.</canvas>
 </div>
 <div class="toast-wrap">

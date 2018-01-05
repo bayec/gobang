@@ -4,16 +4,20 @@
     <meta charset="UTF-8">
     <title>WAD战队五子棋</title>
     <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script src="js/main.js" type="text/javascript"></script>
 </head>
 <body class="setting-body">
 <div class="pve-setting">
     <fieldset class="select-color">
         <legend>选择棋子（执黑先行）</legend>
-        <input type="radio" checked="checked" name="radio-black" id="radio-black" value="black"/>
+        <input type="radio" checked="checked" name="radio-color" id="radio-black" value="black"/>
         <label for="radio-black">黑子</label>
-        <input type="radio" name="radio-white" id="radio-white" value="white"/>
+        <input type="radio" name="radio-color" id="radio-white" value="white"/>
         <label for="radio-white">白子</label>
     </fieldset>
+
+    <a href="index.html"><button class="setting-back">返回</button></a>
+    <a href="pve.html"><button class="setting-ok" onclick="selectColor()">确定</button></a>
 </div>
 </body>
 </html>

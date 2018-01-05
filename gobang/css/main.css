@@ -3,10 +3,9 @@ html,body{
     height: 100%;
 }
 
-.header{
-    /*margin: 20px 0;*/
+h1{
+    margin: 0 0 20px 0;
     text-align: center;
-    background: coral;
 }
 
 .index-body{
@@ -21,6 +20,7 @@ html,body{
     width:  50%;
     height: 50%;
     -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
     border: 1px solid black;
 }
 
@@ -67,17 +67,24 @@ html,body{
     /*overflow: hidden;*/
 }
 
-.clearchessboard{
+.restart{
     font-size: large;
-    margin: 10px 50px;
-    width: 100px;
+    margin: 20px 40px;
+    width: 120px;
+    height: 50px;
+}
+
+.revoke{
+    font-size: large;
+    margin: 20px 40px;
+    width: 120px;
     height: 50px;
 }
 
 .homepage{
     font-size: large;
-    margin: 10px 50px;
-    width: 100px;
+    margin: 20px 40px;
+    width: 120px;
     height: 50px;
 }
 
@@ -93,6 +100,7 @@ html,body{
     width:  50%;
     height: 50%;
     -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
     border: 1px solid black;
 }
 
