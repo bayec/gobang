@@ -135,8 +135,12 @@ function drop(row, col) {
             hasPiece++;
             revokeFlag++;
             if( revokeFlag >= 2 ){
-                var button = document.getElementById('revoke');
-                button.disabled = false;
+                var button_revoke1 = document.getElementById('revoke');
+                button_revoke1.disabled = false;
+            }
+            if( hasPiece >= 2){
+                var button_giveup1 = document.getElementById('giveup');
+                button_giveup1.disabled = false;
             }
             arrayCopy(llastCbArray, lastCbArray);
             arrayCopy(lastCbArray, curCbArray);
@@ -149,8 +153,12 @@ function drop(row, col) {
             hasPiece++;
             revokeFlag++;
             if( revokeFlag >= 2 ){
-                var button1 = document.getElementById('revoke');
-                button1.disabled = false;
+                var button_revoke2 = document.getElementById('revoke');
+                button_revoke2.disabled = false;
+            }
+            if( hasPiece >= 2){
+                var button_giveup2 = document.getElementById('giveup');
+                button_giveup2.disabled = false;
             }
             arrayCopy(llastCbArray, lastCbArray);
             arrayCopy(lastCbArray, curCbArray);
@@ -313,6 +321,26 @@ function revoke() {
     /*悔棋按钮禁止按，因为只能悔一步*/
     var button = document.getElementById('revoke');
     button.disabled = true;
+}
+
+function giveup() {
+    if( isBlack ){
+        ctxOfStatusBar.clearRect(0, 0, canvasOfStatusBar[0].width, canvasOfStatusBar[0].height);
+        ctxOfStatusBar.fillText("白子赢", 0, 100);
+        if( confirm("黑子认输，白子获胜!要重新开始一局吗？") ){
+            restart();
+        }else{
+            isGameOver = true;
+        }
+    }else {
+        ctxOfStatusBar.clearRect(0, 0, canvasOfStatusBar[0].width, canvasOfStatusBar[0].height);
+        ctxOfStatusBar.fillText("黑子赢", 0, 100);
+        if( confirm("白子认输，黑子获胜!要重新开始一局吗？") ){
+            restart();
+        }else{
+            isGameOver = true;
+        }
+    }
 }
 
 /*toast提示*/
