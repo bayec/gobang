@@ -19,7 +19,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <pthread.h>
-#define PVE_FILE "pve_file"
+#define PVE_FILE "/var/www/cgi-bin/data_file/"
 
 
 using namespace std;
@@ -36,6 +36,7 @@ int m_color; //1为黑棋，2为白棋
 int m_x_pos;
 int m_y_pos;
 int m_level;
+char m_timestamp[256];
 typedef struct node
 {
 	int x;
@@ -450,7 +451,7 @@ static void send_pos_msg_to_js(char* pos_info)
 static void save_board_to_file()
 {
 	FILE *fp = NULL;
-	fp = fopen(PVE_FILE,"w+");
+	fp = fopen(m_timestamp,"w+");
 	if(fp == NULL)
 		return;
 	char data[1024] = {0};
@@ -461,7 +462,7 @@ static void save_board_to_file()
 	fwrite(data, len, 1, fp);
 	fclose(fp);
 	fp = NULL;
-	chmod(PVE_FILE, 0777);
+	chmod(m_timestamp, 0777);
 	return;
 }
 
@@ -472,28 +473,39 @@ static void get_board_from_file()
 	char buf[1024] = {0};
 	char pos[4] = {0};
 	int size = 0;
-	fp = fopen(PVE_FILE,"r+");
-	if(fp == NULL)
+	struct stat stat_info;
+	if (lstat(m_timestamp, &stat_info) == 0 && (!S_ISDIR(stat_info.st_mode)))
 	{
-		send_pos_msg_to_js((char *)"Error");
-		return;
-	}
-	size = fread(buf, 1, sizeof(buf)-1, fp);
-	buf[size] = '\0';
-	p = buf;
-	for (int i = 0; i < N; i++) 
-		for (int j = 0; j < N; j++) 
+		fp = fopen(m_timestamp,"r+");
+		if(fp == NULL)
 		{
-			strncpy(pos, p, 1);
-			if(pos[0] != '\0')
-				board[i][j] = atoi(pos); //棋盘初始化 
-			else
-				board[i][j] = 0;
-			if(p && p[0] != '\0')
-				p++;
+			send_pos_msg_to_js((char *)"Error");
+			return;
 		}
-	fclose(fp);
-	fp = NULL;
+		size = fread(buf, 1, sizeof(buf)-1, fp);
+		buf[size] = '\0';
+		p = buf;
+		for (int i = 0; i < N; i++) 
+			for (int j = 0; j < N; j++) 
+			{
+				strncpy(pos, p, 1);
+				if(pos[0] != '\0')
+					board[i][j] = atoi(pos); //棋盘初始化 
+				else
+					board[i][j] = 0;
+				if(p && p[0] != '\0')
+					p++;
+			}
+		fclose(fp);
+		fp = NULL;
+	
+	}
+	else
+	{
+		for (int i = 0; i < N; i++) 
+			for (int j = 0; j < N; j++) 
+				board[i][j] = 0;
+	}
 	return;
 }
 
@@ -503,7 +515,6 @@ static void sw_get_xy_pos()
 	wahaha.Init();
 
 	POINT ps; //棋盘上每个格子的状态,0为啥也没有，1为黑棋，2为白棋
-
 	get_board_from_file();
 
 	if(m_color == 1 && m_is_first == 1) //如果己方执黑且是第一步，则占据棋盘中心位置 黑棋为1，白棋为2 
@@ -545,7 +556,7 @@ static void reset_board_data()
 	FILE *fp = NULL;
 	char data[1024] = {0};
 	int i,j;
-	fp = fopen(PVE_FILE,"w+");
+	fp = fopen(m_timestamp,"w+");
 	if(fp == NULL)
 		return;
 	for (i = 0; i < N; i++) 
@@ -595,6 +606,11 @@ static void parse_msg_from_js(char *msg, int size)
 		pi += strlen("level=");
 	if(pi)
 		m_level = atoi(pi);
+	pi = strstr(buf, "timestamp=");
+	if(pi)
+		pi += strlen("timestamp=");
+	if(pi)
+		snprintf(m_timestamp, sizeof(m_timestamp), "%s%s", PVE_FILE, pi);
 	//printf("type=%d, is_first=%d, color=%d, x=%d, y=%d, level=%d.\n", type, is_first, color, x, y, level);
 	return;
 }
