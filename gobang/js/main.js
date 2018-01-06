@@ -157,7 +157,7 @@ canvasOfMain.onclick = function click(e) {
         }
 
         console.log("棋盘坐标(" + row + "," + col + ")");
-        drop(col, row); //棋盘横竖和二维数组的行列需要反一下
+        drop(col, row, "Human"); //棋盘横竖和二维数组的行列需要反一下
     } else {
         layer.msg('比赛结束，请重新开始或者返回首页！');
     }
