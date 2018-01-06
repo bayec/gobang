@@ -4,12 +4,13 @@ html,body{
 }
 
 .index-body{
-    background: #393D49;
+    /*background: #393D49;*/
+    background: url(../images/bg.jpg);
 }
 
 #nameofgame{
     margin: 100px;
-    color: #00F7DE;
+    color: #000000;
     font-size: xx-large;
     text-align: center;
 }
@@ -67,20 +68,24 @@ html,body{
     font-size: x-large;
 }
 
+#bodyofgame{
+    background: url(../images/bg.jpg);
+}
+
 .main{
     height: 100%;
     /*width: 800px;*/
     margin: 0 300px;
     /*border: 20px solid #7a7a7a;*/
     /*background: url(../images/bak.jpg);*/
-    background: #e8d52c;
+    /*background: #e8d52c;*/
     /*overflow: hidden;*/
 }
 
 .navleft,.navright{
     width: 300px;
     height: 100%;
-    background: #e8d52c;
+    /*background: #e8d52c;*/
 }
 
 .navleft{
@@ -93,8 +98,11 @@ html,body{
 }
 
 #chessboard{
+    position: absolute;
+    top: 10%;
+    left: 25%;
     margin: auto;
-    border: 3px solid black;
+    border: 2px solid black;
     display: block;
 }
 
@@ -108,27 +116,27 @@ html,body{
 }
 
 #restart{
-    top: 5%;
+    top: 10%;
 }
 
 #revoke{
-    top: 15%;
+    top: 20%;
 }
 
 #giveup{
-    top: 25%;
+    top: 30%;
 }
 
 #homepage{
-    top: 35%;
+    top: 40%;
 }
 
 #help{
-    top: 80%;
+    top: 70%;
 }
 
 #about{
-    top: 90%;
+    top: 80%;
 }
 
 .setting-body{
@@ -188,7 +196,7 @@ html,body{
 .statusbar-up{
     position: absolute;
     top: 35%;
-    left: 8%;
+    left: 7.5%;
     width: 36px;
     height: 36px;
     /*border: 1px solid black;*/
@@ -197,7 +205,7 @@ html,body{
 .statusbar-down{
     position: absolute;
     top: 60%;
-    left: 8%;
+    left: 7.5%;
     width: 36px;
     height: 36px;
     /*border: 1px solid black;*/
