@@ -55,9 +55,9 @@ function setGameMode() {
 
     var h1= document.getElementsByTagName("h1")[0];
     if( gameMode === "pvp" ){
-        h1.innerHTML = "双人对战"
+        h1.innerHTML = "双人对战";
     }else{
-        h1.innerHTML = "人机对战"
+        h1.innerHTML = "人机对战";
     }
 }
 
@@ -68,7 +68,7 @@ function pveInit() {
     if(humenColor === "white")
     {
         console.log("Computer is black.");
-        var cmd = "true#black#-1#-1";
+        var cmd = "type=1#first=1#color=1#x=-1#y=-1#level=0";   //type=0#first=0#color=1#x=-1#y=0#level=0
         sw_pve_xmlhttp_send(cmd);
     }
     pveState = 1;
@@ -187,7 +187,7 @@ function drop(row, col, operator) {
             check(1, row, col);
             if(operator === "Human" && pveState === 1)
             {
-                var data1 = "false#black#" + col + "#" + row;
+                var data1 = "type=1#first=0#color=1#x="+ col + "#y=" + row + "#level=0"; //type=0#first=0#color=1#x=-1#y=0#level=0
                 sw_pve_xmlhttp_send(data1);
             }
         } else {
@@ -211,7 +211,7 @@ function drop(row, col, operator) {
             check(2, row, col);
             if(operator === "Human" && pveState === 1)
             {
-                var data2 = "false#white#" + col + "#" + row;
+                var data2 = "type=1#first=0#color=2#x="+ col + "#y=" + row + "#level=0";
                 sw_pve_xmlhttp_send(data2);
             }
         }
@@ -303,6 +303,13 @@ function check(color, row, col) {
 
             var buttonGiveup = document.getElementById('giveup');
             buttonGiveup.disabled = true;
+			if(pveState === 1)
+			{
+				console.log("Reset cgi board.");
+				var data = "type=0#first=0#color=0#x=-1#y=-1#level=0";
+				sw_pve_xmlhttp_send(data);
+				pveState = 0;
+			}
         }
     }
 
@@ -347,6 +354,8 @@ function restart() {
     isGameOver = false;
     isBlack = true;
     hasPiece = 0;
+	var data = "type=0#first=0#color=-1#x=-1#y=-1#level=0";
+	sw_pve_xmlhttp_send(data);
 }
 
 /*悔棋*/
@@ -400,6 +409,8 @@ function giveup() {
 
     var buttonGiveup = document.getElementById('giveup');
     buttonGiveup.disabled = true;
+	var data = "type=0#first=0#color=0#x=-1#y=-1#level=0";
+	sw_pve_xmlhttp_send(data);
 }
 
 /*人机模式下判断用户选择的是黑子还是白子*/
@@ -441,7 +452,13 @@ function sw_pve_xmlhttp_callback() {
     //判断对象状态是交互完成，接收服务器返回的数据
     if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
         console.log("Text" + ":" + xmlhttp.responseText);
+		if(xmlhttp.responseText === "Reset OK")
+		{
+			console.log("reset ok");
+			return;
+		}
         var pos = xmlhttp.responseText.split("#");
+		console.log("Computer setp x=" + pos[0] + ",y=" + pos[1]);
         drop(parseInt(pos[1]), parseInt(pos[0]), "Computer");
     }
     else

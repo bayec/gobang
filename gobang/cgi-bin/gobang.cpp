@@ -24,8 +24,18 @@
 
 using namespace std;
 int X,Y;
-int colour;
 int N=15; //棋盘大小
+enum MSG_TYPE{
+	RESET = 0,
+	RUN,
+	REVORK,
+};
+int m_type = 0;
+int m_is_first = 0;
+int m_color; //1为黑棋，2为白棋 
+int m_x_pos;
+int m_y_pos;
+int m_level;
 typedef struct node
 {
 	int x;
@@ -83,8 +93,7 @@ void Game::Run(POINT & ps)
 }
 
 
-//算法2：只考虑当前情况，不递归的（贪心法)
-//参考Zhong_Zw的程序，下载自CSDN
+//只考虑当前情况，不递归的（贪心法)
 void Game::Way(POINT & ps)
 {
 	int i,j;
@@ -113,8 +122,8 @@ void Game::Way(POINT & ps)
 		{
 			if (board[i][j] == 0)
 			{
-				SetScore(i, j, colour, HumanState);
-				SetScore(i, j, 3-colour, ComputerState);
+				SetScore(i, j, m_color, HumanState);
+				SetScore(i, j, 3 - m_color, ComputerState);
 			}
 		}
 	}
@@ -427,11 +436,6 @@ int Game::p_Score(int num, int bp[])
 	return max;
 }
 
-static char m_is_first[8] = {0}; 
-static char m_color[8] = {0};
-static char m_x_pos[4] = {0};
-static char m_y_pos[4] = {0};
-static bool m_init = false;
 
 static void send_pos_msg_to_js(char* pos_info)
 {
@@ -443,52 +447,66 @@ static void send_pos_msg_to_js(char* pos_info)
 	return;
 }
 
-Game wahaha;
-static void get_xy_pos()
+static void save_board_to_file()
 {
 	FILE *fp = NULL;
-	char *p = NULL, *q = NULL;
+	fp = fopen(PVE_FILE,"w+");
+	if(fp == NULL)
+		return;
+	char data[1024] = {0};
+	int len = 0;
+	for (int i = 0; i < N; i++) 
+		for (int j = 0; j < N; j++) 
+			len += snprintf(data+len, sizeof(data)-len, "%d", board[i][j]);
+	fwrite(data, len, 1, fp);
+	fclose(fp);
+	fp = NULL;
+	chmod(PVE_FILE, 0777);
+	return;
+}
+
+static void get_board_from_file()
+{
+	FILE *fp = NULL;
+	char *p = NULL;
 	char buf[1024] = {0};
 	char pos[4] = {0};
+	int size = 0;
 	fp = fopen(PVE_FILE,"r+");
 	if(fp == NULL)
 	{
 		send_pos_msg_to_js((char *)"Error");
 		return;
 	}
-	int size = fread(buf, 1, sizeof(buf)-1, fp);
+	size = fread(buf, 1, sizeof(buf)-1, fp);
 	buf[size] = '\0';
 	p = buf;
-	wahaha.Init();
-//	char pos_info[4046] = {0};
 	for (int i = 0; i < N; i++) 
 		for (int j = 0; j < N; j++) 
 		{
 			strncpy(pos, p, 1);
-			if(pos && pos[0] != '\0')
+			if(pos[0] != '\0')
 				board[i][j] = atoi(pos); //棋盘初始化 
 			else
 				board[i][j] = 0;
 			if(p && p[0] != '\0')
 				p++;
 		}
-#if 0
-			if(board[i][j] == 1)
-				snprintf(pos_info+strlen(pos_info), sizeof(pos_info)-strlen(pos), "[x:%d,y:%d]", i, j);
-			else
-				snprintf(pos_info+strlen(pos_info), sizeof(pos_info)-strlen(pos), "[%d+%d]", i, j);
-		}
-	printf("content-type:text/html\n\n");
-	printf("%s", pos_info);
-#endif
-	if(strcmp(m_color, "black") == 0)
-		colour = 1;
-	else
-		colour = 2;
+	fclose(fp);
+	fp = NULL;
+	return;
+}
+
+static void sw_get_xy_pos()
+{
+	Game wahaha;
+	wahaha.Init();
 
 	POINT ps; //棋盘上每个格子的状态,0为啥也没有，1为黑棋，2为白棋
 
-	if(colour == 1 && strcmp(m_is_first, "true") == 0) //如果己方执黑且是第一步，则占据棋盘中心位置 黑棋为1，白棋为2 
+	get_board_from_file();
+
+	if(m_color == 1 && m_is_first == 1) //如果己方执黑且是第一步，则占据棋盘中心位置 黑棋为1，白棋为2 
 	{ 
 		for (int i = 0; i < N; i++) 
 			for (int j = 0; j < N; j++) 
@@ -500,14 +518,14 @@ static void get_xy_pos()
 	}
 	else 
 	{
-		board[atoi(m_x_pos)][atoi(m_y_pos)] = 3 - colour;
+		board[m_x_pos][m_y_pos] = 3 - m_color;
 		//更新棋盘信息 
 		do
 		{ 
 			wahaha.Run(ps);
 			if (board[X][Y] == 0) //如果该位置为空则占据该位置 
 			{
-				board[X][Y] = colour; //更新棋盘信息 
+				board[X][Y] = m_color; //更新棋盘信息 
 				char msg[16] = {0};
 				snprintf(msg, sizeof(msg),"%d#%d", X, Y);
 				send_pos_msg_to_js(msg);
@@ -517,72 +535,94 @@ static void get_xy_pos()
 		while (true); 
 		//循环直至随机得到一个空位置 
 	}
-	fp = fopen(PVE_FILE,"w+");
-	if(fp == NULL)
-		return;
-	char data[1024] = {0};
-	int len = 0;
-	for (int i = 0; i < N; i++) 
-		for (int j = 0; j < N; j++) 
-			len += snprintf(data+len, sizeof(data)-len, "%d", board[i][j]);
-	fwrite(data, len, 1, fp);
-#if 0
-	printf("content-type:text/html\n\n");
-	printf("%s", data);
-#endif
-	fclose(fp);
-	fp = NULL;
-	chmod(PVE_FILE, 0777);
+	save_board_to_file();
 	wahaha.~Game();
 }
 
-static void *parse_thread_func(void *arg)
+static void reset_board_data()
 {
+	int len = 0;
+	FILE *fp = NULL;
+	char data[1024] = {0};
+	int i,j;
+	fp = fopen(PVE_FILE,"w+");
+	if(fp == NULL)
+		return;
+	for (i = 0; i < N; i++) 
+		for (j = 0; j < N; j++) 
+			len += snprintf(data+len, sizeof(data)-len, "%d", 0);
+	fwrite(data, len, 1, fp);
+	fclose(fp);
+	fp = NULL;
+	send_pos_msg_to_js((char *)"Reset OK");
+	return;
+}
+
+static void parse_msg_from_js(char *msg, int size)
+{
+	//strcpy(buf, "type=0#first=0#color=1#x=-1#y=0#level=0");
+	if(msg == NULL || size <= 0)
+		return;
+	char *buf = msg;
+	char *pi = NULL;
+	pi = strstr(buf, "type=");
+	if(pi)
+		pi += strlen("type=");
+	if(pi)
+		m_type = atoi(pi);
+	pi = strstr(buf, "first=");
+	if(pi)
+		pi += strlen("first=");
+	if(pi)
+		m_is_first = atoi(pi);
+	pi = strstr(buf, "color=");
+	if(pi)
+		pi += strlen("color=");
+	if(pi)
+		m_color = atoi(pi);
+	pi = strstr(buf, "x=");
+	if(pi)
+		pi += strlen("x=");
+	if(pi)
+		m_x_pos = atoi(pi);
+	pi = strstr(buf, "y=");
+	if(pi)
+		pi += strlen("y=");
+	if(pi)
+		m_y_pos = atoi(pi);
+	pi = strstr(buf, "level=");
+	if(pi)
+		pi += strlen("level=");
+	if(pi)
+		m_level = atoi(pi);
+	//printf("type=%d, is_first=%d, color=%d, x=%d, y=%d, level=%d.\n", type, is_first, color, x, y, level);
+	return;
+}
+
+int main() 
+{ 
 	int len = 0;
 	char buf[1024] = {0};
 	char *recvbuf = NULL;
 	recvbuf = getenv("CONTENT_LENGTH");
 	if(recvbuf == NULL)
-		return NULL;
+		return -1;
 	len = atoi(recvbuf);
 	if((len > 0)&&(fgets(buf, len+1, stdin)!=NULL))
 	{
-		char *p = NULL, *q = NULL;
-		p = q = buf;
-		q = strstr(p, "#");
-		if(q)
-		{
-			strncpy(m_is_first, p, q-p);
-			q++;
+		parse_msg_from_js(buf, len+1);
+		switch (m_type){
+			case RESET: 
+				reset_board_data();
+				break;
+			case RUN:
+				sw_get_xy_pos();
+				break;
+			case REVORK: //悔棋
+				break;
+			default:
+				break;
 		}
-		p = strstr(q, "#");
-		if(p)
-		{
-			strncpy(m_color, q, p-q);
-			p++;
-		}
-		q = strstr(p, "#");
-		if(q)
-		{
-			strncpy(m_x_pos, p, q-p);
-			q++;
-		}
-		strcpy(m_y_pos, q);
-		get_xy_pos();
 	}
-	return NULL;
-}
-
-int main() 
-{ 
-	pthread_attr_t attr;
-	pthread_attr_init(&attr);
-	pthread_t m_cmd_thread_id;
-	sched_param param;
-	param.sched_priority = 0;
-	int res = pthread_create(&m_cmd_thread_id, &attr, parse_thread_func, NULL);
-	if(res == -1)
-		return -1;
-	pthread_join(m_cmd_thread_id, NULL);
 	return 0; 
 }
