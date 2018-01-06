@@ -297,13 +297,13 @@ function check(color, row, col) {
                 isGameOver = true;
                 layer.msg('白子获胜!');
             }
-        }
-        //禁用悔棋和认输
-        var buttonRevoke = document.getElementById('revoke');
-        buttonRevoke.disabled = true;
+            //禁用悔棋和认输
+            var buttonRevoke = document.getElementById('revoke');
+            buttonRevoke.disabled = true;
 
-        var buttonGiveup = document.getElementById('giveup');
-        buttonGiveup.disabled = true;
+            var buttonGiveup = document.getElementById('giveup');
+            buttonGiveup.disabled = true;
+        }
     }
 
     //重置当前棋子的坐标和连子数
