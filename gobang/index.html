@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <title>WAD战队五子棋</title>
     <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" type="text/css" href="layer/theme/default/layer.css">
     <script src="js/jquery-1.12.4.min.js" type="text/javascript"></script>
+    <script src="js/main.js" type="text/javascript"></script>
     <script src="layer/layer.js" type="text/javascript"></script>
 </head>
 <body class="index-body">
@@ -12,10 +14,14 @@
     <p class="select-mode">游戏模式</p>
     <hr>
     <div class="pvp">
-        <a href="game.html"><button class="button-pvp">双人对战</button></a>
+        <form action="game.html">
+            <button class="button-pvp" id="button-pvp" name="gamemode" value="pvp">双人对战</button>
+        </form>
     </div>
     <div class="pve">
-        <a href="setting.html"><button class="button-pve">人机大战</button></a>
+        <form action="setting.html">
+            <button class="button-pve" id="button-pve" name="gamemode" value="pve">人机对战</button>
+        </form>
     </div>
 </div>
 </body>

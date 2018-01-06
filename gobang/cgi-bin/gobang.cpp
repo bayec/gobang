@@ -500,7 +500,7 @@ static void get_xy_pos()
 	}
 	else 
 	{
-		board[atoi(m_x_pos)][atoi(m_y_pos)] = colour;
+		board[atoi(m_x_pos)][atoi(m_y_pos)] = 3 - colour;
 		//更新棋盘信息 
 		do
 		{ 

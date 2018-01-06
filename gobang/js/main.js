@@ -17,20 +17,28 @@ var white = new Image();
 black.src = "images/black.png";
 white.src = "images/white.png";
 
-/*canvas初始化*/
-var canvasOfMain = document.getElementById('chessboard');
-var ctxOfMain = canvasOfMain.getContext("2d");  //获取该canvas的2D绘图环境对象
-ctxOfMain.strokeStyle = "#333";
-drawChessboard(ctxOfMain);
-document.getElementById("statusbar").style.backgroundImage = "url(./images/black.png)";
-layer.tips('轮到黑子走了！', '#statusbar');
-
 /*棋盘状态标志位*/
-var isPvp = true;   //记录当前游戏模式
+var gameMode = null;   //当前游戏模式
+var humenColor = null; //用户棋子颜色
+var whoDrop = null; //当前谁走
 var isBlack = true; //当前棋子是否为黑色
 var isGameOver = false; //当前局是否结束
 var hasPiece = 0; //当前棋盘有几颗棋子
 var revokeFlag = 0;    //悔棋标志位，大于等于2才能悔棋
+var pveState = 0;   //人机大战状态
+var xmlhttp = null; //xml的http请求
+
+/*canvas初始化*/
+var canvasOfMain = document.getElementById('chessboard');
+var ctxOfMain = canvasOfMain.getContext("2d");  //获取该canvas的2D绘图环境对象
+ctxOfMain.strokeStyle = "#333";
+setGameMode();
+if( gameMode !== "pvp" ){
+    pveInit();
+}
+drawChessboard(ctxOfMain);
+document.getElementById("statusbar").style.backgroundImage = "url(./images/black.png)";
+layer.tips('轮到黑子走了！', '#statusbar');
 
 /*状态栏初始化*/
 var canvasOfStatusBar = document.getElementsByClassName('statusbar');
@@ -39,6 +47,33 @@ var ctxOfStatusBar = canvasOfStatusBar[0].getContext("2d");
 ctxOfStatusBar.beginPath();
 ctxOfStatusBar.font = ("100px Georgia");
 ctxOfStatusBar.fillStyle = "#F70707";
+
+/*设置游戏模式*/
+function setGameMode() {
+    var url = window.location.href;
+    gameMode = url.substring(url.lastIndexOf('=')+1, url.length);
+
+    var h1= document.getElementsByTagName("h1")[0];
+    if( gameMode === "pvp" ){
+        h1.innerHTML = "双人对战"
+    }else{
+        h1.innerHTML = "人机对战"
+    }
+}
+
+/*人机大战初始化*/
+function pveInit() {
+    var url = window.location.href;
+    humenColor = url.substring(url.lastIndexOf('=') + 1, url.length);
+    if(humenColor === "white")
+    {
+        console.log("Computer is black.");
+        var cmd = "true#black#-1#-1";
+        sw_pve_xmlhttp_send(cmd);
+    }
+    pveState = 1;
+    console.log("Human VS Computer Begin.");
+}
 
 /*二维数组初始化*/
 function arrayInit(size) {
@@ -124,12 +159,12 @@ canvasOfMain.onclick = function click(e) {
         console.log("棋盘坐标(" + row + "," + col + ")");
         drop(col, row); //棋盘横竖和二维数组的行列需要反一下
     } else {
-        layer.msg('比赛结束，请点击重新开始！');
+        layer.msg('比赛结束，请重新开始或者返回首页！');
     }
 };
 
 /*落子*/
-function drop(row, col) {
+function drop(row, col, operator) {
     if (curCbArray[row][col] === 0) {
         if (isBlack) {//下黑子
             ctxOfMain.drawImage(black, col * 36 + 18, row * 36 + 18);
@@ -150,6 +185,11 @@ function drop(row, col) {
             arrayCopy(lastCbArray, curCbArray);
             curCbArray[row][col] = 1; //黑子为1
             check(1, row, col);
+            if(operator === "Human" && pveState === 1)
+            {
+                var data1 = "false#black#" + col + "#" + row;
+                sw_pve_xmlhttp_send(data1);
+            }
         } else {
             ctxOfMain.drawImage(white, col * 36 + 18, row * 36 + 18);
             document.getElementById("statusbar").style.backgroundImage = "url(./images/black.png)";
@@ -169,6 +209,11 @@ function drop(row, col) {
             arrayCopy(lastCbArray, curCbArray);
             curCbArray[row][col] = 2; //白子为2
             check(2, row, col);
+            if(operator === "Human" && pveState === 1)
+            {
+                var data2 = "false#white#" + col + "#" + row;
+                sw_pve_xmlhttp_send(data2);
+            }
         }
     }
 }
@@ -253,6 +298,12 @@ function check(color, row, col) {
                 layer.msg('白子获胜!');
             }
         }
+        //禁用悔棋和认输
+        var buttonRevoke = document.getElementById('revoke');
+        buttonRevoke.disabled = true;
+
+        var buttonGiveup = document.getElementById('giveup');
+        buttonGiveup.disabled = true;
     }
 
     //重置当前棋子的坐标和连子数
@@ -353,6 +404,7 @@ function giveup() {
 
 /*人机模式下判断用户选择的是黑子还是白子*/
 function selectColor() {
+    console.log("ksjdfklajdfklasjfklsdjfsklajdfalsdjf");
     var radio = document.getElementsByName("radio-color");
     for (var i = 0; i < radio.length; i++) {
         if (radio[i].checked) {
@@ -362,8 +414,6 @@ function selectColor() {
         }
     }
 }
-
-var xmlhttp = null;
 
 function sw_pve_xmlhttp_send(data) {
     console.log(data);
@@ -389,10 +439,10 @@ function sw_pve_xmlhttp_send(data) {
 
 function sw_pve_xmlhttp_callback() {
     //判断对象状态是交互完成，接收服务器返回的数据
-    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+    if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
         console.log("Text" + ":" + xmlhttp.responseText);
         var pos = xmlhttp.responseText.split("#");
-        drop(pos[1], pos[0]);
+        drop(pos[1], pos[0], "Computer");
     }
     else
         console.log("state=" + xmlhttp.status);
