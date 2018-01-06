@@ -6,10 +6,10 @@ console.log(clientWidth + "X" + clientHeight);
 var curCbArray = arrayInit(15);
 
 /*定义一个二维数组，保存前一次的棋盘状态*/
-var lastCbArray = arrayInit(15);
+var preCbArray = arrayInit(15);
 
 /*定义一个二维数组，保存前两次的棋盘状态*/
-var llastCbArray = arrayInit(15);
+var prePreCbArray = arrayInit(15);
 
 /*棋子初始化*/
 var black = new Image();
@@ -33,15 +33,42 @@ var timestamp = null;
 var canvasOfMain = document.getElementById('chessboard');
 var ctxOfMain = canvasOfMain.getContext("2d");  //获取该canvas的2D绘图环境对象
 ctxOfMain.strokeStyle = "#333";
-setGameMode();
-if( gameMode !== "pvp" ){
-    pveInit();
+
+gameInit();
+
+/*游戏初始化*/
+function gameInit() {
+    setGameMode();  //设置游戏模式
+    if( gameMode === "pve" ){
+        pveInit();
+    }
+    drawChessboard(ctxOfMain);  //画棋盘
+
+    /*设置棋子状态框*/
+    document.getElementById("statusbar-up").style.backgroundImage = "url(./images/black.png)";
+
+    /*设置头像框和提示语*/
+    if( gameMode === "pve" && humanColor === "black" )
+    {
+        layer.tips('让你先下，愚蠢的人类！', '#player-down',{
+            time:2000
+        });
+        document.getElementById("player-up").style.backgroundImage = "url(./images/man.jpg)";
+        document.getElementById("player-down").style.backgroundImage = "url(./images/ai.jpg)";
+    }else if( gameMode === "pve" && humanColor === "white" ){
+        layer.tips('机器人，你先！', '#player-down',{
+            time:2000
+        });
+        document.getElementById("player-down").style.backgroundImage = "url(./images/man.jpg)";
+        document.getElementById("player-up").style.backgroundImage = "url(./images/ai.jpg)";
+    }else if( gameMode === "pvp" ){
+        layer.tips('亲爱的，你先下！', '#player-down',{
+            time:2000
+        });
+        document.getElementById("player-up").style.backgroundImage = "url(./images/man.jpg)";
+        document.getElementById("player-down").style.backgroundImage = "url(./images/woman.jpg)";
+    }
 }
-drawChessboard(ctxOfMain);
-document.getElementById("statusbar-up").style.backgroundImage = "url(./images/black.png)";
-layer.tips('轮到黑子走了！', '#statusbar-up',{
-    time:1000
-});
 
 /*获取URL后面跟的参数*/
 function GetUrlPara()
@@ -204,9 +231,21 @@ function drop(row, col, operator) {
             });
             document.getElementById("statusbar-up").style.backgroundImage = "none";
             document.getElementById("statusbar-down").style.backgroundImage = "url(./images/white.png)";
-            layer.tips('轮到白子走了！', '#statusbar-down',{
-                time:1000
-            });
+            /*设置提示语*/
+            if( gameMode === "pve" && humanColor === "black" )
+            {
+                layer.tips('轮到你了，机器人！', '#player-up',{
+                    time:2000
+                });
+            }else if( gameMode === "pve" && humanColor === "white" ){
+                layer.tips('该你了，愚蠢的人类！', '#player-up',{
+                    time:2000
+                });
+            }else if( gameMode === "pvp" ){
+                layer.tips('该你了，宝贝！', '#player-up',{
+                    time:2000
+                });
+            }
             isBlack = false;
             hasPiece++;
             revokeFlag++;
@@ -220,8 +259,8 @@ function drop(row, col, operator) {
                 button_giveup1.setAttribute("class", "layui-btn layui-btn-radius layui-btn-primary");
                 button_giveup1.disabled = false;
             }
-            arrayCopy(llastCbArray, lastCbArray);
-            arrayCopy(lastCbArray, curCbArray);
+            arrayCopy(prePreCbArray, preCbArray);
+            arrayCopy(preCbArray, curCbArray);
             curCbArray[row][col] = 1; //黑子为1
             check(1, row, col);
             if(operator === "Human" && pveState === 1)
@@ -237,9 +276,21 @@ function drop(row, col, operator) {
             });
             document.getElementById("statusbar-down").style.backgroundImage = "none";
             document.getElementById("statusbar-up").style.backgroundImage = "url(./images/black.png)";
-            layer.tips('轮到黑子走了！', '#statusbar-up',{
-                time:1000
-            });
+            /*设置提示语*/
+            if( gameMode === "pve" && humanColor === "black" )
+            {
+                layer.tips('该你了，愚蠢的人类!', '#player-down',{
+                    time:2000
+                });
+            }else if( gameMode === "pve" && humanColor === "white" ){
+                layer.tips('轮到你了，机器人!', '#player-down',{
+                    time:2000
+                });
+            }else if( gameMode === "pvp" ){
+                layer.tips('轮到你了，亲爱的!', '#player-down',{
+                    time:2000
+                });
+            }
             isBlack = true;
             hasPiece++;
             revokeFlag++;
@@ -253,8 +304,8 @@ function drop(row, col, operator) {
                 button_giveup2.setAttribute("class", "layui-btn layui-btn-radius layui-btn-primary");
                 button_giveup2.disabled = false;
             }
-            arrayCopy(llastCbArray, lastCbArray);
-            arrayCopy(lastCbArray, curCbArray);
+            arrayCopy(prePreCbArray, preCbArray);
+            arrayCopy(preCbArray, curCbArray);
             curCbArray[row][col] = 2; //白子为2
             check(2, row, col);
             if(operator === "Human" && pveState === 1)
@@ -274,6 +325,20 @@ function drop(row, col, operator) {
 function check(color, row, col) {
     if( hasPiece >= 225 ){
         isGameOver = true;
+        /*if( gameMode === "pve" && humanColor === "black" )
+        {
+            layer.tips('该你了，愚蠢的人类!', '#player-down',{
+                time:2000
+            });
+        }else if( gameMode === "pve" && humanColor === "white" ){
+            layer.tips('轮到你了，机器人!', '#player-down',{
+                time:2000
+            });
+        }else if( gameMode === "pvp" ){
+            layer.tips('轮到你了，亲爱的!', '#player-down',{
+                time:2000
+            });
+        }*/
         layer.msg("和棋");
     }
 
@@ -343,9 +408,67 @@ function check(color, row, col) {
         if (total >= 5) {
             if (color === 1) {
                 isGameOver = true;
+                /*设置提示语和胜利状态*/
+                if( gameMode === "pve" && humanColor === "black" ) {
+                    layer.tips('怎么可能，我竟然输了！', '#player-down',{
+                        time:3000,
+                        tipsMore:true
+                    });
+                    layer.tips('承让！', '#player-up',{
+                        time:3000,
+                        tipsMore:true
+                    });
+                }else if( gameMode === "pve" && humanColor === "white" ){
+                    layer.tips('哈哈，人类果然愚蠢！', '#player-up',{
+                        time:3000,
+                        tipsMore:true
+                    });
+                    layer.tips('可恶！', '#player-down',{
+                        time:3000,
+                        tipsMore:true
+                    });
+                }else if( gameMode === "pvp" ) {
+                    layer.tips('宝贝，再来一局吧！', '#player-up',{
+                        time:3000,
+                        tipsMore:true
+                    });
+                    layer.tips('亲爱的，你真厉害！', '#player-down', {
+                        time:3000,
+                        tipsMore:true
+                    });
+                }
                 layer.msg('黑子获胜!');
             } else {
                 isGameOver = true;
+                /*设置提示语和胜利状态*/
+                if( gameMode === "pve" && humanColor === "black" ) {
+                    layer.tips('哈哈，人类果然愚蠢！', '#player-down',{
+                        time:3000,
+                        tipsMore:true
+                    });
+                    layer.tips('可恶！', '#player-up',{
+                        time:3000,
+                        tipsMore:true
+                    });
+                }else if( gameMode === "pve" && humanColor === "white" ){
+                    layer.tips('怎么可能，我竟然输了！', '#player-up',{
+                        time:3000,
+                        tipsMore:true
+                    });
+                    layer.tips('承让！', '#player-down',{
+                        time:3000,
+                        tipsMore:true
+                    });
+                }else if( gameMode === "pvp" ) {
+                    layer.tips('宝贝，你真是美貌与智慧并存！', '#player-up',{
+                        time:3000,
+                        tipsMore:true
+                    });
+                    layer.tips('亲爱的，别灰心！', '#player-down', {
+                        time:3000,
+                        tipsMore:true
+                    });
+                }
                 layer.msg('白子获胜!');
             }
             //禁用悔棋和认输
@@ -361,7 +484,6 @@ function check(color, row, col) {
 				console.log("Reset cgi board.");
 				var data = "type=0#first=0#color=0#x=-1#y=-1#level=0#timestamp=" + timestamp;
 				sw_pve_xmlhttp_send(data);
-				pveState = 0;
 			}
         }
     }
@@ -381,11 +503,11 @@ function restart() {
             if (curCbArray[i][j] !== 0) {
                 curCbArray[i][j] = 0;
             }
-            if (lastCbArray[i][j] !== 0) {
-                lastCbArray[i][j] = 0;
+            if (preCbArray[i][j] !== 0) {
+                preCbArray[i][j] = 0;
             }
-            if (llastCbArray[i][j] !== 0) {
-                llastCbArray[i][j] = 0;
+            if (prePreCbArray[i][j] !== 0) {
+                prePreCbArray[i][j] = 0;
             }
         }
     }
@@ -405,9 +527,22 @@ function restart() {
 
     // ctxOfStatusBar.clearRect(0, 0, canvasOfStatusBar[0].width, canvasOfStatusBar[0].height);
     document.getElementById("statusbar-up").style.backgroundImage = "url(./images/black.png)";
-    layer.tips('轮到黑子走了！', '#statusbar-up',{
-        time:1000
-    });
+    document.getElementById("statusbar-down").style.backgroundImage = "none";
+    /*设置头像框和提示语*/
+    if( gameMode === "pve" && humanColor === "black" )
+    {
+        layer.tips('让你先下，愚蠢的人类！', '#player-down',{
+            time:2000
+        });
+    }else if( gameMode === "pve" && humanColor === "white" ){
+        layer.tips('机器人，你先！', '#player-down',{
+            time:2000
+        });
+    }else if( gameMode === "pvp" ) {
+        layer.tips('亲爱的，你先下！', '#player-down', {
+            time: 2000
+        });
+    }
     isGameOver = false;
     isBlack = true;
     hasPiece = 0;
@@ -429,24 +564,24 @@ function revoke() {
     //重新摆子
     for (var i = 0; i < 15; i++) {
         for (var j = 0; j < 15; j++) {
-            if (llastCbArray[i][j] === 1) {
+            if (prePreCbArray[i][j] === 1) {
                 //ctxOfMain.drawImage(black, j * 36 + 18, i * 36 + 18);
                 preImage(black.src, function(){
-                    ctxOfMain.drawImage(this, col * 36 + 18, row * 36 + 18 );
+                    ctxOfMain.drawImage(this, j * 36 + 18, i * 36 + 18 );
                 });
-            } else if (llastCbArray[i][j] === 2) {
+            } else if (prePreCbArray[i][j] === 2) {
                 //ctxOfMain.drawImage(white, j * 36 + 18, i * 36 + 18);
                 preImage(white.src, function(){
-                    ctxOfMain.drawImage(this, col * 36 + 18, row * 36 + 18 );
+                    ctxOfMain.drawImage(this, j * 36 + 18, i * 36 + 18 );
                 });
             }
         }
     }
 
     /*回退当前棋盘状态，清空前两次棋盘状态*/
-    arrayCopy(curCbArray, llastCbArray);
-    arrayReset(llastCbArray);
-    arrayReset(lastCbArray);
+    arrayCopy(curCbArray, prePreCbArray);
+    arrayReset(prePreCbArray);
+    arrayReset(preCbArray);
 
     /*减两颗棋子*/
     if (hasPiece <= 1) {
@@ -462,6 +597,10 @@ function revoke() {
     var button = document.getElementById('revoke');
     button.setAttribute("class", "layui-btn layui-btn-radius layui-btn-disabled");
     button.disabled = true;
+    if( pveState === 1 ){
+        var data = "type=2#first=0#color="+ humanColor + "#x=-1#y=-1#level=0#timestamp=" + timestamp;
+        sw_pve_xmlhttp_send(data);
+    }
 }
 
 /*认输*/
