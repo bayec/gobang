@@ -27,6 +27,7 @@ var hasPiece = 0; //当前棋盘有几颗棋子
 var revokeFlag = 0;    //悔棋标志位，大于等于2才能悔棋
 var pveState = 0;   //人机大战状态
 var xmlhttp = null; //xml的http请求
+var timestamp = null;
 
 /*canvas初始化*/
 var canvasOfMain = document.getElementById('chessboard');
@@ -86,14 +87,15 @@ function setGameMode() {
 function pveInit() {
     var para = new GetUrlPara();
     humanColor = para.color;
+	timestamp=new Date().getTime();
     if( humanColor === "white" )
     {
         console.log("Computer is black.");
-        var cmd = "type=1#first=1#color=1#x=-1#y=-1#level=0";   //type=0#first=0#color=1#x=-1#y=0#level=0
+		var cmd = "type=1#first=1#color=1#x=-1#y=-1#level=0#timestamp=" + timestamp;   //type=0#first=0#color=1#x=-1#y=0#level=0#timestamp=12345678
         sw_pve_xmlhttp_send(cmd);
     }
     pveState = 1;
-    console.log("Human VS Computer Begin.");
+	console.log("Human VS Computer Begin." + timestamp);
 }
 
 /*二维数组初始化*/
@@ -212,7 +214,7 @@ function drop(row, col, operator) {
             check(1, row, col);
             if(operator === "Human" && pveState === 1)
             {
-                var data1 = "type=1#first=0#color=1#x="+ col + "#y=" + row + "#level=0"; //type=0#first=0#color=1#x=-1#y=0#level=0
+				var data1 = "type=1#first=0#color=1#x="+ col + "#y=" + row + "#level=0#timestamp=" + timestamp; //type=0#first=0#color=1#x=-1#y=0#level=0#timestamp=12345678
                 sw_pve_xmlhttp_send(data1);
             }
         } else {
@@ -240,7 +242,7 @@ function drop(row, col, operator) {
             check(2, row, col);
             if(operator === "Human" && pveState === 1)
             {
-                var data2 = "type=1#first=0#color=2#x="+ col + "#y=" + row + "#level=0";
+				var data2 = "type=1#first=0#color=2#x="+ col + "#y=" + row + "#level=0#timestamp=" + timestamp;
                 sw_pve_xmlhttp_send(data2);
             }
         }
@@ -346,7 +348,7 @@ function check(color, row, col) {
 			if(pveState === 1)
 			{
 				console.log("Reset cgi board.");
-				var data = "type=0#first=0#color=0#x=-1#y=-1#level=0";
+				var data = "type=0#first=0#color=0#x=-1#y=-1#level=0#timestamp=" + timestamp;
 				sw_pve_xmlhttp_send(data);
 				pveState = 0;
 			}
@@ -398,7 +400,7 @@ function restart() {
     isGameOver = false;
     isBlack = true;
     hasPiece = 0;
-	var data = "type=0#first=0#color=-1#x=-1#y=-1#level=0";
+	var data = "type=0#first=0#color=-1#x=-1#y=-1#level=0#timestamp=" + timestamp;
 	sw_pve_xmlhttp_send(data);
 }
 
@@ -457,7 +459,7 @@ function giveup() {
     var buttonGiveup = document.getElementById('giveup');
     buttonGiveup.setAttribute("class", "layui-btn layui-btn-radius layui-btn-disabled");
     buttonGiveup.disabled = true;
-	var data = "type=0#first=0#color=0#x=-1#y=-1#level=0";
+	var data = "type=0#first=0#color=0#x=-1#y=-1#level=0#timestamp=" + timestamp;
 	sw_pve_xmlhttp_send(data);
 }
 
@@ -465,7 +467,7 @@ function giveup() {
 function gohomepage()
 {
 	console.log("gohomepage");
-	var data = "type=0#first=0#color=0#x=-1#y=-1#level=0";
+	var data = "type=0#first=0#color=0#x=-1#y=-1#level=0#timestamp=" + timestamp;
 	sw_pve_xmlhttp_send(data);
 	self.location = "index.html";
 
