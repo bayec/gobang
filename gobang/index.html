@@ -4,25 +4,45 @@
     <meta charset="UTF-8">
     <title>WAD战队五子棋</title>
     <link rel="stylesheet" type="text/css" href="css/main.css">
-    <link rel="stylesheet" type="text/css" href="layer/theme/default/layer.css">
+    <link rel="stylesheet" type="text/css" href="layui/css/layui.css">
     <script src="js/jquery-1.12.4.min.js" type="text/javascript"></script>
-    <script src="js/main.js" type="text/javascript"></script>
-    <script src="layer/layer.js" type="text/javascript"></script>
+    <script src="layui/layui.all.js" type="text/javascript"></script>
 </head>
 <body class="index-body">
+<div>
+    <h1 id="nameofgame">五子棋小游戏</h1>
+</div>
 <div id="new-game">
-    <p class="select-mode">游戏模式</p>
-    <hr>
     <div class="pvp">
         <form action="game.html">
-            <button class="button-pvp" id="button-pvp" name="gamemode" value="pvp">双人对战</button>
+            <button class="layui-btn layui-btn-primary" id="button-pvp" name="gamemode" value="pvp">双 人 对 战</button>
         </form>
     </div>
     <div class="pve">
-        <form action="setting.html">
-            <button class="button-pve" id="button-pve" name="gamemode" value="pve">人机对战</button>
-        </form>
+        <button class="layui-btn layui-btn-primary" id="button-pve" name="gamemode" value="pve" onclick="startPVE()">人 机
+            对 战
+        </button>
+    </div>
+    <div class="exit">
+        <button class="layui-btn layui-btn-primary" id="button-exit" name="button-exit" onclick="window.close()">退 出 游
+            戏
+        </button>
     </div>
 </div>
+<script>
+    /*人机模式下弹出配置页面*/
+    function startPVE() {
+        layer.open({
+            type: 2,
+            title: ['人机模式配置', 'font-size:20px;'],
+            area: ['630px', '360px'],
+            shade: 0.8,
+            closeBtn: 1,
+            anim: 0,
+            shadeClose: true,
+            content: 'setting.html'
+        });
+    }
+</script>
 </body>
 </html>

@@ -4,25 +4,32 @@ html,body{
 }
 
 .index-body{
-    background: #ffd53e;
+    background: #393D49;
+}
+
+#nameofgame{
+    margin: 100px;
+    color: #00F7DE;
+    font-size: xx-large;
+    text-align: center;
 }
 
 #new-game{
     position: fixed;
     top: 50%;
     left: 50%;
-    /*background-color: #ffffff;*/
     width:  50%;
     height: 50%;
     -webkit-transform: translateX(-50%) translateY(-50%);
     transform: translateX(-50%) translateY(-50%);
-    border: 1px solid black;
+    /*border: 1px solid black;*/
 }
 
+/*
 .select-mode{
     font-size: x-large;
     text-align: center;
-}
+}*/
 
 .pvp{
     margin: 20px auto;
@@ -34,15 +41,29 @@ html,body{
     text-align: center;
 }
 
-.button-pvp{
-    width: 150px;
-    height: 50px;
+.exit{
+    margin: 20px auto;
+    text-align: center;
+}
+
+#button-pvp{
+    margin: 20px 0;
+    width: 300px;
+    height: 80px;
     font-size: x-large;
 }
 
-.button-pve{
-    width: 150px;
-    height: 50px;
+#button-pve{
+    margin: 20px 0;
+    width: 300px;
+    height: 80px;
+    font-size: x-large;
+}
+
+#button-exit{
+    margin: 20px 0;
+    width: 300px;
+    height: 80px;
     font-size: x-large;
 }
 
@@ -52,14 +73,14 @@ html,body{
     margin: 0 300px;
     /*border: 20px solid #7a7a7a;*/
     /*background: url(../images/bak.jpg);*/
-    background: #ffb12b;
+    background: #e8d52c;
     /*overflow: hidden;*/
 }
 
 .navleft,.navright{
     width: 300px;
     height: 100%;
-    background: #ffb12b;
+    background: #e8d52c;
 }
 
 .navleft{
@@ -77,70 +98,96 @@ html,body{
     display: block;
 }
 
-.restart{
+#restart,#revoke,#giveup,#homepage,#help,#about{
+    position: absolute;
+    top: 10%;
     font-size: large;
-    margin: 40px 0 20px 180px;
     width: 120px;
     height: 50px;
+    margin: auto 0;
 }
 
-.revoke{
-    font-size: large;
-    margin: 20px 0 20px 180px;
-    width: 120px;
-    height: 50px;
+#restart{
+    top: 5%;
 }
 
-.giveup{
-    font-size: large;
-    margin: 20px 0 20px 180px;
-    width: 120px;
-    height: 50px;
+#revoke{
+    top: 15%;
 }
 
-.homepage{
-    font-size: large;
-    margin: 20px 0 20px 180px;
-    width: 120px;
-    height: 50px;
+#giveup{
+    top: 25%;
+}
+
+#homepage{
+    top: 35%;
+}
+
+#help{
+    top: 80%;
+}
+
+#about{
+    top: 90%;
 }
 
 .setting-body{
-    background: #ffd53e;
+    background: #ffffff;
 }
 
-.pve-setting{
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    /*background-color: #ffffff;*/
-    width:  50%;
-    height: 50%;
-    -webkit-transform: translateX(-50%) translateY(-50%);
-    transform: translateX(-50%) translateY(-50%);
-    border: 1px solid black;
+/*#pve-setting{*/
+    /*position: fixed;*/
+    /*top: 50%;*/
+    /*left: 50%;*/
+    /*!*background-color: #ffffff;*!*/
+    /*width:  50%;*/
+    /*height: 50%;*/
+    /*-webkit-transform: translateX(-50%) translateY(-50%);*/
+    /*transform: translateX(-50%) translateY(-50%);*/
+    /*!*border: 1px solid black;*!*/
+/*}*/
+
+/*.select-color{*/
+    /*margin: 0 10px;*/
+    /*width: 80px;*/
+    /*height: 50px;*/
+    /*font-size: large;*/
+/*}*/
+
+.gamemode{
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    /*text-align: right;*/
+    /*margin: auto 0 auto auto;*/
 }
 
-.select-color{
-    margin: 0 10px;
-    width: 80px;
-    height: 50px;
-    font-size: large;
+.player-up,.player-down,.statusbar{
+    position: absolute;
+    left: 5%;
+    display: block;
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
+.player-up{
+    top: 20%;
+    width: 100px;
+    height: 100px;
+    /*border: 1px solid black;*/
+    /*background: url("../images/black.png");*/
+}
+.player-down{
+    top: 70%;
+    width: 100px;
+    height: 100px;
+    /*border: 1px solid black;*/
+    /*background: url("../images/black.png");*/
 }
 
 .statusbar{
-    /*margin: auto;*/
-    position: absolute;
     top: 50%;
-    left: 0%;
+    left: 8%;
     width: 36px;
     height: 36px;
-    /*text-align: center;*/
-    /*color: #f00;*/
-    /*border: 1px solid;*/
-    /*line-height: 40px;*/
-    display: block;
-    /*background: url("../images/black.png");*/
-    -webkit-transform: translateY(-50%);
-    transform: translateY(-50%);
 }

@@ -19,7 +19,7 @@ white.src = "images/white.png";
 
 /*棋盘状态标志位*/
 var gameMode = null;   //当前游戏模式
-var humenColor = null; //用户棋子颜色
+var humanColor = null; //用户棋子颜色
 var whoDrop = null; //当前谁走
 var isBlack = true; //当前棋子是否为黑色
 var isGameOver = false; //当前局是否结束
@@ -48,27 +48,46 @@ ctxOfStatusBar.beginPath();
 ctxOfStatusBar.font = ("100px Georgia");
 ctxOfStatusBar.fillStyle = "#F70707";
 
+/*获取URL后面跟的参数*/
+function GetUrlPara()
+{
+    var name = null, value = null;
+    var str = location.href; //取得整个地址栏
+    var num = str.indexOf("?");
+    str = str.substr(num+1); //取得所有参数   stringvar.substr(start [, length ]
+
+    var arr = str.split("&"); //各个参数放到数组里
+    for(var i = 0; i < arr.length; i++){
+        num = arr[i].indexOf("=");
+        if(num > 0){
+            name = arr[i].substring(0, num);
+            value = arr[i].substr(num+1);
+            this[name] = value;
+        }
+    }
+}
+
 /*设置游戏模式*/
 function setGameMode() {
-    var url = window.location.href;
-    gameMode = url.substring(url.lastIndexOf('=')+1, url.length);
+    var h1 = document.getElementsByTagName("h1")[0];
+    var para = new GetUrlPara();
+    gameMode = para.gamemode;
 
-    var h1= document.getElementsByTagName("h1")[0];
     if( gameMode === "pvp" ){
-        h1.innerHTML = "双人对战"
-    }else{
-        h1.innerHTML = "人机对战"
+        h1.innerHTML = "双人对战";
+    }else if( gameMode === "pve" ){
+        h1.innerHTML = "人机对战";
     }
 }
 
 /*人机大战初始化*/
 function pveInit() {
-    var url = window.location.href;
-    humenColor = url.substring(url.lastIndexOf('=') + 1, url.length);
-    if(humenColor === "white")
+    var para = new GetUrlPara();
+    humanColor = para.color;
+    if( humanColor === "white" )
     {
         console.log("Computer is black.");
-        var cmd = "true#black#-1#-1";
+        var cmd = "type=1#first=1#color=1#x=-1#y=-1#level=0";   //type=0#first=0#color=1#x=-1#y=0#level=0
         sw_pve_xmlhttp_send(cmd);
     }
     pveState = 1;
@@ -187,7 +206,7 @@ function drop(row, col, operator) {
             check(1, row, col);
             if(operator === "Human" && pveState === 1)
             {
-                var data1 = "false#black#" + col + "#" + row;
+                var data1 = "type=1#first=0#color=1#x="+ col + "#y=" + row + "#level=0"; //type=0#first=0#color=1#x=-1#y=0#level=0
                 sw_pve_xmlhttp_send(data1);
             }
         } else {
@@ -211,7 +230,7 @@ function drop(row, col, operator) {
             check(2, row, col);
             if(operator === "Human" && pveState === 1)
             {
-                var data2 = "false#white#" + col + "#" + row;
+                var data2 = "type=1#first=0#color=2#x="+ col + "#y=" + row + "#level=0";
                 sw_pve_xmlhttp_send(data2);
             }
         }
@@ -303,6 +322,13 @@ function check(color, row, col) {
 
             var buttonGiveup = document.getElementById('giveup');
             buttonGiveup.disabled = true;
+			if(pveState === 1)
+			{
+				console.log("Reset cgi board.");
+				var data = "type=0#first=0#color=0#x=-1#y=-1#level=0";
+				sw_pve_xmlhttp_send(data);
+				pveState = 0;
+			}
         }
     }
 
@@ -347,6 +373,8 @@ function restart() {
     isGameOver = false;
     isBlack = true;
     hasPiece = 0;
+	var data = "type=0#first=0#color=-1#x=-1#y=-1#level=0";
+	sw_pve_xmlhttp_send(data);
 }
 
 /*悔棋*/
@@ -386,6 +414,7 @@ function revoke() {
     button.disabled = true;
 }
 
+/*认输*/
 function giveup() {
     if (isBlack) {
         layer.msg('黑子认输，白子获胜！');
@@ -400,19 +429,42 @@ function giveup() {
 
     var buttonGiveup = document.getElementById('giveup');
     buttonGiveup.disabled = true;
+	var data = "type=0#first=0#color=0#x=-1#y=-1#level=0";
+	sw_pve_xmlhttp_send(data);
 }
 
-/*人机模式下判断用户选择的是黑子还是白子*/
-function selectColor() {
-    console.log("ksjdfklajdfklasjfklsdjfsklajdfalsdjf");
-    var radio = document.getElementsByName("radio-color");
-    for (var i = 0; i < radio.length; i++) {
-        if (radio[i].checked) {
-            if (radio[i].value === "black") {
+/*返回首页*/
+function gohomepage()
+{
+	console.log("gohomepage");
+	var data = "type=0#first=0#color=0#x=-1#y=-1#level=0";
+	sw_pve_xmlhttp_send(data);
+	self.location = "index.html";
 
-            }
-        }
-    }
+}
+
+/*帮助*/
+function help() {
+    layer.open({
+        type: 2,
+        title: ['游戏帮助', 'font-size:20px;'],
+        area: ['800px', '600px'],
+        shade: 0.8,
+        closeBtn: 1,
+        anim: 1,
+        shadeClose: true,
+        content: '//baike.baidu.com/item/五子棋/130266?fr=aladdin'
+    });
+}
+
+/*关于*/
+function about() {
+    layer.open({
+        type: 2,
+        area: ['360px', '500px'],
+        skin: 'layui-layer-rim', //加上边框
+        content: ['about.html', 'no']
+    });
 }
 
 function sw_pve_xmlhttp_send(data) {
@@ -441,7 +493,13 @@ function sw_pve_xmlhttp_callback() {
     //判断对象状态是交互完成，接收服务器返回的数据
     if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
         console.log("Text" + ":" + xmlhttp.responseText);
+		if(xmlhttp.responseText === "Reset OK")
+		{
+			console.log("reset ok");
+			return;
+		}
         var pos = xmlhttp.responseText.split("#");
+		console.log("Computer setp x=" + pos[0] + ",y=" + pos[1]);
         drop(parseInt(pos[1]), parseInt(pos[0]), "Computer");
     }
     else
