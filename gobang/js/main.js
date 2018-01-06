@@ -413,17 +413,13 @@ function giveup() {
 	sw_pve_xmlhttp_send(data);
 }
 
-/*人机模式下判断用户选择的是黑子还是白子*/
-function selectColor() {
-    console.log("ksjdfklajdfklasjfklsdjfsklajdfalsdjf");
-    var radio = document.getElementsByName("radio-color");
-    for (var i = 0; i < radio.length; i++) {
-        if (radio[i].checked) {
-            if (radio[i].value === "black") {
+function gohomepage()
+{
+	console.log("gohomepage");
+	var data = "type=0#first=0#color=0#x=-1#y=-1#level=0";
+	sw_pve_xmlhttp_send(data);
+	self.location = "index.html";
 
-            }
-        }
-    }
 }
 
 function sw_pve_xmlhttp_send(data) {
