@@ -4,25 +4,32 @@ html,body{
 }
 
 .index-body{
-    background: #ffd53e;
+    background: #393D49;
+}
+
+#nameofgame{
+    margin: 100px;
+    color: #00F7DE;
+    font-size: xx-large;
+    text-align: center;
 }
 
 #new-game{
     position: fixed;
     top: 50%;
     left: 50%;
-    /*background-color: #ffffff;*/
     width:  50%;
     height: 50%;
     -webkit-transform: translateX(-50%) translateY(-50%);
     transform: translateX(-50%) translateY(-50%);
-    border: 1px solid black;
+    /*border: 1px solid black;*/
 }
 
+/*
 .select-mode{
     font-size: x-large;
     text-align: center;
-}
+}*/
 
 .pvp{
     margin: 20px auto;
@@ -34,15 +41,29 @@ html,body{
     text-align: center;
 }
 
-.button-pvp{
-    width: 150px;
-    height: 50px;
+.exit{
+    margin: 20px auto;
+    text-align: center;
+}
+
+#button-pvp{
+    margin: 20px 0;
+    width: 300px;
+    height: 80px;
     font-size: x-large;
 }
 
-.button-pve{
-    width: 150px;
-    height: 50px;
+#button-pve{
+    margin: 20px 0;
+    width: 300px;
+    height: 80px;
+    font-size: x-large;
+}
+
+#button-exit{
+    margin: 20px 0;
+    width: 300px;
+    height: 80px;
     font-size: x-large;
 }
 
