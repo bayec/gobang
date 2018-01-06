@@ -19,7 +19,7 @@ white.src = "images/white.png";
 
 /*棋盘状态标志位*/
 var gameMode = null;   //当前游戏模式
-var humenColor = null; //用户棋子颜色
+var humanColor = null; //用户棋子颜色
 var whoDrop = null; //当前谁走
 var isBlack = true; //当前棋子是否为黑色
 var isGameOver = false; //当前局是否结束
@@ -48,24 +48,43 @@ ctxOfStatusBar.beginPath();
 ctxOfStatusBar.font = ("100px Georgia");
 ctxOfStatusBar.fillStyle = "#F70707";
 
+/*获取URL后面跟的参数*/
+function GetUrlPara()
+{
+    var name = null, value = null;
+    var str = location.href; //取得整个地址栏
+    var num = str.indexOf("?");
+    str = str.substr(num+1); //取得所有参数   stringvar.substr(start [, length ]
+
+    var arr = str.split("&"); //各个参数放到数组里
+    for(var i = 0; i < arr.length; i++){
+        num = arr[i].indexOf("=");
+        if(num > 0){
+            name = arr[i].substring(0, num);
+            value = arr[i].substr(num+1);
+            this[name] = value;
+        }
+    }
+}
+
 /*设置游戏模式*/
 function setGameMode() {
-    var url = window.location.href;
-    gameMode = url.substring(url.lastIndexOf('=')+1, url.length);
+    var h1 = document.getElementsByTagName("h1")[0];
+    var para = new GetUrlPara();
+    gameMode = para.gamemode;
 
-    var h1= document.getElementsByTagName("h1")[0];
     if( gameMode === "pvp" ){
         h1.innerHTML = "双人对战";
-    }else{
+    }else if( gameMode === "pve" ){
         h1.innerHTML = "人机对战";
     }
 }
 
 /*人机大战初始化*/
 function pveInit() {
-    var url = window.location.href;
-    humenColor = url.substring(url.lastIndexOf('=') + 1, url.length);
-    if(humenColor === "white")
+    var para = new GetUrlPara();
+    humanColor = para.color;
+    if( humanColor === "white" )
     {
         console.log("Computer is black.");
         var cmd = "type=1#first=1#color=1#x=-1#y=-1#level=0";   //type=0#first=0#color=1#x=-1#y=0#level=0
@@ -395,6 +414,7 @@ function revoke() {
     button.disabled = true;
 }
 
+/*认输*/
 function giveup() {
     if (isBlack) {
         layer.msg('黑子认输，白子获胜！');
@@ -413,6 +433,7 @@ function giveup() {
 	sw_pve_xmlhttp_send(data);
 }
 
+/*返回首页*/
 function gohomepage()
 {
 	console.log("gohomepage");
@@ -420,6 +441,30 @@ function gohomepage()
 	sw_pve_xmlhttp_send(data);
 	self.location = "index.html";
 
+}
+
+/*帮助*/
+function help() {
+    layer.open({
+        type: 2,
+        title: ['游戏帮助', 'font-size:20px;'],
+        area: ['800px', '600px'],
+        shade: 0.8,
+        closeBtn: 1,
+        anim: 1,
+        shadeClose: true,
+        content: '//baike.baidu.com/item/五子棋/130266?fr=aladdin'
+    });
+}
+
+/*关于*/
+function about() {
+    layer.open({
+        type: 2,
+        area: ['360px', '500px'],
+        skin: 'layui-layer-rim', //加上边框
+        content: ['about.html', 'no']
+    });
 }
 
 function sw_pve_xmlhttp_send(data) {

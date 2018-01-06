@@ -19,13 +19,30 @@
         </form>
     </div>
     <div class="pve">
-        <form action="setting.html">
-            <button class="layui-btn layui-btn-primary" id="button-pve" name="gamemode" value="pve">人 机 对 战</button>
-        </form>
+        <button class="layui-btn layui-btn-primary" id="button-pve" name="gamemode" value="pve" onclick="startPVE()">人 机
+            对 战
+        </button>
     </div>
     <div class="exit">
-        <button class="layui-btn layui-btn-primary" id="button-exit" name="button-exit" onclick="window.close()">退 出 游 戏</button>
+        <button class="layui-btn layui-btn-primary" id="button-exit" name="button-exit" onclick="window.close()">退 出 游
+            戏
+        </button>
     </div>
 </div>
+<script>
+    /*人机模式下弹出配置页面*/
+    function startPVE() {
+        layer.open({
+            type: 2,
+            title: ['人机模式配置', 'font-size:20px;'],
+            area: ['630px', '360px'],
+            shade: 0.8,
+            closeBtn: 1,
+            anim: 0,
+            shadeClose: true,
+            content: 'setting.html'
+        });
+    }
+</script>
 </body>
 </html>

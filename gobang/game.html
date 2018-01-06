@@ -4,20 +4,31 @@
     <meta charset="UTF-8">
     <title>WAD战队五子棋</title>
     <link rel="stylesheet" type="text/css" href="css/main.css">
-    <link rel="stylesheet" type="text/css" href="layer/theme/default/layer.css">
+    <link rel="stylesheet" type="text/css" href="layui/css/layui.css">
     <script src="js/jquery-1.12.4.min.js" type="text/javascript"></script>
-    <script src="layer/layer.js" type="text/javascript"></script>
+    <script src="layui/layui.all.js" type="text/javascript"></script>
 </head>
 <body>
 <div class="navleft">
-    <button class="restart" onclick="restart()">重新开始</button>
-    <button class="revoke" id="revoke" disabled="disabled" onclick="revoke()">悔 棋</button>
-    <button class="giveup" id="giveup" disabled="disabled" onclick="giveup()">认 输</button>
-	<a><button class="homepage" onclick="gohomepage()">返回首页</button></a>
+    <h1 class="gamemode">双人对战</h1>
+    <canvas class="player-up" id="player-up">Your browser does not support the HTML5 canvas tag.</canvas>
+    <canvas class="statusbar" id="statusbar">Your browser does not support the HTML5 canvas tag.</canvas>
+    <canvas class="player-down" id="player-up">Your browser does not support the HTML5 canvas tag.</canvas>
 </div>
 <div class="navright">
-    <h1 class="gamemode">双人对战</h1>
-    <canvas class="statusbar" id="statusbar">Your browser does not support the HTML5 canvas tag.</canvas>
+    <button class="layui-btn layui-btn-radius layui-btn-primary" id="restart" onclick="restart()">重新开始</button>
+    <button class="layui-btn layui-btn-radius layui-btn-primary" id="revoke" disabled="disabled" onclick="revoke()">悔
+        棋
+    </button>
+    <button class="layui-btn layui-btn-radius layui-btn-primary" id="giveup" disabled="disabled" onclick="giveup()">认
+        输
+    </button>
+    <!--<a href="index.html">
+        <button class="layui-btn layui-btn-radius layui-btn-primary" id="homepage">回到首页</button>
+    </a>-->
+    <a><button class="layui-btn layui-btn-radius layui-btn-primary" id="homepage" onclick="gohomepage()">回到首页</button></a>
+    <button class="layui-btn layui-btn-radius layui-btn-primary" id="help" onclick="help()">帮 助</button>
+    <button class="layui-btn layui-btn-radius layui-btn-primary" id="about" onclick="about()">关 于</button>
 </div>
 <div class="main">
     <br><br>
