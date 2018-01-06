@@ -38,7 +38,9 @@ if( gameMode !== "pvp" ){
 }
 drawChessboard(ctxOfMain);
 document.getElementById("statusbar").style.backgroundImage = "url(./images/black.png)";
-layer.tips('轮到黑子走了！', '#statusbar');
+layer.tips('轮到黑子走了！', '#statusbar',{
+    time:1000
+});
 
 /*状态栏初始化*/
 var canvasOfStatusBar = document.getElementsByClassName('statusbar');
@@ -188,16 +190,20 @@ function drop(row, col, operator) {
         if (isBlack) {//下黑子
             ctxOfMain.drawImage(black, col * 36 + 18, row * 36 + 18);
             document.getElementById("statusbar").style.backgroundImage = "url(./images/white.png)";
-            layer.tips('轮到白子走了！', '#statusbar');
+            layer.tips('轮到白子走了！', '#statusbar',{
+                time:1000
+            });
             isBlack = false;
             hasPiece++;
             revokeFlag++;
             if (revokeFlag >= 2) {
                 var button_revoke1 = document.getElementById('revoke');
+                button_revoke1.setAttribute("class", "layui-btn layui-btn-radius layui-btn-primary");
                 button_revoke1.disabled = false;
             }
             if (hasPiece >= 2) {
                 var button_giveup1 = document.getElementById('giveup');
+                button_giveup1.setAttribute("class", "layui-btn layui-btn-radius layui-btn-primary");
                 button_giveup1.disabled = false;
             }
             arrayCopy(llastCbArray, lastCbArray);
@@ -212,16 +218,20 @@ function drop(row, col, operator) {
         } else {
             ctxOfMain.drawImage(white, col * 36 + 18, row * 36 + 18);
             document.getElementById("statusbar").style.backgroundImage = "url(./images/black.png)";
-            layer.tips('轮到黑子走了！', '#statusbar');
+            layer.tips('轮到黑子走了！', '#statusbar',{
+                time:1000
+            });
             isBlack = true;
             hasPiece++;
             revokeFlag++;
             if (revokeFlag >= 2) {
                 var button_revoke2 = document.getElementById('revoke');
+                button_revoke2.setAttribute("class", "layui-btn layui-btn-radius layui-btn-primary");
                 button_revoke2.disabled = false;
             }
             if (hasPiece >= 2) {
                 var button_giveup2 = document.getElementById('giveup');
+                button_giveup2.setAttribute("class", "layui-btn layui-btn-radius layui-btn-primary");
                 button_giveup2.disabled = false;
             }
             arrayCopy(llastCbArray, lastCbArray);
@@ -234,11 +244,20 @@ function drop(row, col, operator) {
                 sw_pve_xmlhttp_send(data2);
             }
         }
+    }else{
+        layer.msg("当前位置已经存在棋子！", {
+            time: 1000 //2秒关闭（如果不配置，默认是3秒）
+        });
     }
 }
 
 /*判断棋局是否结束*/
 function check(color, row, col) {
+    if( hasPiece >= 225 ){
+        isGameOver = true;
+        layer.msg("和棋");
+    }
+
     var rowBak = row, colBak = col, total = 1;
 
     //判断东西方向（←→）是否有五个
@@ -318,9 +337,11 @@ function check(color, row, col) {
             }
             //禁用悔棋和认输
             var buttonRevoke = document.getElementById('revoke');
+            buttonRevoke.setAttribute("class", "layui-btn layui-btn-radius layui-btn-disabled");
             buttonRevoke.disabled = true;
 
             var buttonGiveup = document.getElementById('giveup');
+            buttonGiveup.setAttribute("class", "layui-btn layui-btn-radius layui-btn-disabled");
             buttonGiveup.disabled = true;
 			if(pveState === 1)
 			{
@@ -362,14 +383,18 @@ function restart() {
 
     //禁用悔棋和认输
     var buttonRevoke = document.getElementById('revoke');
+    buttonRevoke.setAttribute("class", "layui-btn layui-btn-radius layui-btn-disabled");
     buttonRevoke.disabled = true;
 
     var buttonGiveup = document.getElementById('giveup');
+    buttonGiveup.setAttribute("class", "layui-btn layui-btn-radius layui-btn-disabled");
     buttonGiveup.disabled = true;
 
     ctxOfStatusBar.clearRect(0, 0, canvasOfStatusBar[0].width, canvasOfStatusBar[0].height);
     document.getElementById("statusbar").style.backgroundImage = "url(./images/black.png)";
-    layer.tips('轮到黑子走了！', '#statusbar');
+    layer.tips('轮到黑子走了！', '#statusbar',{
+        time:1000
+    });
     isGameOver = false;
     isBlack = true;
     hasPiece = 0;
@@ -411,6 +436,7 @@ function revoke() {
 
     /*悔棋按一次后禁止再按，因为只能悔一步，需要等悔完以后再下两步使能按钮*/
     var button = document.getElementById('revoke');
+    button.setAttribute("class", "layui-btn layui-btn-radius layui-btn-disabled");
     button.disabled = true;
 }
 
@@ -425,9 +451,11 @@ function giveup() {
 
     //禁用悔棋和认输
     var buttonRevoke = document.getElementById('revoke');
+    buttonRevoke.setAttribute("class", "layui-btn layui-btn-radius layui-btn-disabled");
     buttonRevoke.disabled = true;
 
     var buttonGiveup = document.getElementById('giveup');
+    buttonGiveup.setAttribute("class", "layui-btn layui-btn-radius layui-btn-disabled");
     buttonGiveup.disabled = true;
 	var data = "type=0#first=0#color=0#x=-1#y=-1#level=0";
 	sw_pve_xmlhttp_send(data);
@@ -461,6 +489,7 @@ function help() {
 function about() {
     layer.open({
         type: 2,
+        title: ['关于', 'font-size:20px;'],
         area: ['360px', '500px'],
         skin: 'layui-layer-rim', //加上边框
         content: ['about.html', 'no']
