@@ -29,6 +29,7 @@ enum MSG_TYPE{
 	RESET = 0,
 	RUN,
 	REVORK,
+	RESTART,
 };
 int m_type = 0;
 int m_is_first = 0;
@@ -36,7 +37,7 @@ int m_color; //1为黑棋，2为白棋
 int m_x_pos;
 int m_y_pos;
 int m_level;
-char m_timestamp[256];
+char m_timestamp[1024];
 typedef struct node
 {
 	int x;
@@ -526,6 +527,7 @@ static void sw_get_xy_pos()
 		char msg[16] = {0};
 		snprintf(msg, sizeof(msg),"%d#%d", N/2, N/2);
 		send_pos_msg_to_js(msg);
+	//	send_pos_msg_to_js((char *)"Reset OK");
 	}
 	else 
 	{
@@ -548,6 +550,28 @@ static void sw_get_xy_pos()
 	}
 	save_board_to_file();
 	wahaha.~Game();
+}
+
+static void restart_board_data()
+{
+	int len = 0;
+	FILE *fp = NULL;
+	char data[1024] = {0};
+	int i,j;
+	fp = fopen(m_timestamp,"w+");
+	if(fp == NULL)
+		return;
+	for (i = 0; i < N; i++) 
+		for (j = 0; j < N; j++) 
+			len += snprintf(data+len, sizeof(data)-len, "%d", 0);
+	fwrite(data, len, 1, fp);
+	fclose(fp);
+	fp = NULL;
+	if(m_color == 1)
+		sw_get_xy_pos();
+	else
+		send_pos_msg_to_js((char *)"Reset OK");
+	return;
 }
 
 static void reset_board_data()
@@ -611,7 +635,7 @@ static void parse_msg_from_js(char *msg, int size)
 		pi += strlen("timestamp=");
 	if(pi)
 		snprintf(m_timestamp, sizeof(m_timestamp), "%s%s", PVE_FILE, pi);
-	//printf("type=%d, is_first=%d, color=%d, x=%d, y=%d, level=%d.\n", type, is_first, color, x, y, level);
+//	printf("type=%d, is_first=%d, color=%d, x=%d, y=%d, level=%d, m_timestamp=%s.\n", m_type, m_is_first, m_color, m_x_pos, m_y_pos, m_level, m_timestamp);
 	return;
 }
 
@@ -627,6 +651,8 @@ int main()
 	if((len > 0)&&(fgets(buf, len+1, stdin)!=NULL))
 	{
 		parse_msg_from_js(buf, len+1);
+//		strcpy(buf, "type=3#first=1#color=1#x=-1#y=-1#level=0#timestamp=1515255533393");
+		parse_msg_from_js(buf, sizeof(buf));
 		switch (m_type){
 			case RESET: 
 				reset_board_data();
@@ -635,6 +661,9 @@ int main()
 				sw_get_xy_pos();
 				break;
 			case REVORK: //悔棋
+				break;
+			case RESTART:
+				restart_board_data();
 				break;
 			default:
 				break;
