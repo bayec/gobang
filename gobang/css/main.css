@@ -171,23 +171,34 @@ html,body{
 }
 
 .player-up{
-    top: 20%;
+    top: 30%;
     width: 100px;
     height: 100px;
-    /*border: 1px solid black;*/
+    border: 1px solid black;
     /*background: url("../images/black.png");*/
 }
 .player-down{
     top: 70%;
     width: 100px;
     height: 100px;
-    /*border: 1px solid black;*/
+    border: 1px solid black;
     /*background: url("../images/black.png");*/
 }
 
-.statusbar{
-    top: 50%;
-    left: 8%;
+.statusbar-up{
+    position: absolute;
+    top: 40%;
+    left: 7%;
     width: 36px;
     height: 36px;
+    /*border: 1px solid black;*/
+}
+
+.statusbar-down{
+    position: absolute;
+    top: 55%;
+    left: 7%;
+    width: 36px;
+    height: 36px;
+    /*border: 1px solid black;*/
 }

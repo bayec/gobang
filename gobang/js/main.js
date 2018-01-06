@@ -38,18 +38,10 @@ if( gameMode !== "pvp" ){
     pveInit();
 }
 drawChessboard(ctxOfMain);
-document.getElementById("statusbar").style.backgroundImage = "url(./images/black.png)";
-layer.tips('轮到黑子走了！', '#statusbar',{
+document.getElementById("statusbar-up").style.backgroundImage = "url(./images/black.png)";
+layer.tips('轮到黑子走了！', '#statusbar-up',{
     time:1000
 });
-
-/*状态栏初始化*/
-var canvasOfStatusBar = document.getElementsByClassName('statusbar');
-var ctxOfStatusBar = canvasOfStatusBar[0].getContext("2d");
-
-ctxOfStatusBar.beginPath();
-ctxOfStatusBar.font = ("100px Georgia");
-ctxOfStatusBar.fillStyle = "#F70707";
 
 /*获取URL后面跟的参数*/
 function GetUrlPara()
@@ -91,7 +83,8 @@ function pveInit() {
     if( humanColor === "white" )
     {
         console.log("Computer is black.");
-		var cmd = "type=1#first=1#color=1#x=-1#y=-1#level=0#timestamp=" + timestamp;   //type=0#first=0#color=1#x=-1#y=0#level=0#timestamp=12345678
+        //type=0#first=0#color=1#x=-1#y=0#level=0#timestamp=12345678
+		var cmd = "type=1#first=1#color=1#x=-1#y=-1#level=0#timestamp=" + timestamp;
         sw_pve_xmlhttp_send(cmd);
     }
     pveState = 1;
@@ -133,7 +126,7 @@ function drawChessboard(ctxOfMain) {
     //下面这四行绘制正方形，对于15X15的棋盘，横竖绘制14个正方形即可
     for (var i = 0; i < curCbArray.length - 1; i++) {
         for (var j = 0; j < curCbArray.length - 1; j++) {
-            ctxOfMain.strokeRect(i * 36 + 36, j * 36 + 36, 36, 36);  //绘制40像素的正方形
+            ctxOfMain.strokeRect(i * 36 + 36, j * 36 + 36, 36, 36);  //绘制36x36像素的正方形
         }
     }
 
@@ -186,13 +179,32 @@ canvasOfMain.onclick = function click(e) {
     }
 };
 
+/*图片预加载，防止canvas的drawImage失效的问题*/
+function preImage(url,callback){
+    var img = new Image(); //创建一个Image对象，实现图片的预下载
+    img.src = url;
+
+    if (img.complete) { // 如果图片已经存在于浏览器缓存，直接调用回调函数
+        callback.call(img);
+        return; // 直接返回，不用再处理onload事件
+    }
+
+    img.onload = function () { //图片下载完毕时异步调用callback函数。
+        callback.call(img);//将回调函数的this替换为Image对象
+    };
+}
+
 /*落子*/
 function drop(row, col, operator) {
     if (curCbArray[row][col] === 0) {
         if (isBlack) {//下黑子
-            ctxOfMain.drawImage(black, col * 36 + 18, row * 36 + 18);
-            document.getElementById("statusbar").style.backgroundImage = "url(./images/white.png)";
-            layer.tips('轮到白子走了！', '#statusbar',{
+            //ctxOfMain.drawImage(black, col * 36 + 18, row * 36 + 18);   //直接drawImage可能失效，用下面的方法预加载
+            preImage(black.src, function(){
+                ctxOfMain.drawImage(this, col * 36 + 18, row * 36 + 18 );
+            });
+            document.getElementById("statusbar-up").style.backgroundImage = "none";
+            document.getElementById("statusbar-down").style.backgroundImage = "url(./images/white.png)";
+            layer.tips('轮到白子走了！', '#statusbar-down',{
                 time:1000
             });
             isBlack = false;
@@ -214,13 +226,18 @@ function drop(row, col, operator) {
             check(1, row, col);
             if(operator === "Human" && pveState === 1)
             {
-				var data1 = "type=1#first=0#color=1#x="+ col + "#y=" + row + "#level=0#timestamp=" + timestamp; //type=0#first=0#color=1#x=-1#y=0#level=0#timestamp=12345678
+                //type=0#first=0#color=1#x=-1#y=0#level=0#timestamp=12345678
+				var data1 = "type=1#first=0#color=1#x="+ col + "#y=" + row + "#level=0#timestamp=" + timestamp;
                 sw_pve_xmlhttp_send(data1);
             }
         } else {
-            ctxOfMain.drawImage(white, col * 36 + 18, row * 36 + 18);
-            document.getElementById("statusbar").style.backgroundImage = "url(./images/black.png)";
-            layer.tips('轮到黑子走了！', '#statusbar',{
+            //ctxOfMain.drawImage(white, col * 36 + 18, row * 36 + 18);
+            preImage(white.src, function(){
+                ctxOfMain.drawImage(this, col * 36 + 18, row * 36 + 18 );
+            });
+            document.getElementById("statusbar-down").style.backgroundImage = "none";
+            document.getElementById("statusbar-up").style.backgroundImage = "url(./images/black.png)";
+            layer.tips('轮到黑子走了！', '#statusbar-up',{
                 time:1000
             });
             isBlack = true;
@@ -325,15 +342,9 @@ function check(color, row, col) {
     function isWin() {
         if (total >= 5) {
             if (color === 1) {
-                // canvasOfStatusBar[0].innerHTML="黑子赢";
-                ctxOfStatusBar.clearRect(0, 0, canvasOfStatusBar[0].width, canvasOfStatusBar[0].height);
-                // ctxOfStatusBar.fillText("黑子赢", 0, 100);
                 isGameOver = true;
                 layer.msg('黑子获胜!');
             } else {
-                // canvasOfStatusBar[0].innerHTML="白子赢";
-                ctxOfStatusBar.clearRect(0, 0, canvasOfStatusBar[0].width, canvasOfStatusBar[0].height);
-                // ctxOfStatusBar.fillText("白子赢", 0, 100);
                 isGameOver = true;
                 layer.msg('白子获胜!');
             }
@@ -392,15 +403,20 @@ function restart() {
     buttonGiveup.setAttribute("class", "layui-btn layui-btn-radius layui-btn-disabled");
     buttonGiveup.disabled = true;
 
-    ctxOfStatusBar.clearRect(0, 0, canvasOfStatusBar[0].width, canvasOfStatusBar[0].height);
-    document.getElementById("statusbar").style.backgroundImage = "url(./images/black.png)";
-    layer.tips('轮到黑子走了！', '#statusbar',{
+    // ctxOfStatusBar.clearRect(0, 0, canvasOfStatusBar[0].width, canvasOfStatusBar[0].height);
+    document.getElementById("statusbar-up").style.backgroundImage = "url(./images/black.png)";
+    layer.tips('轮到黑子走了！', '#statusbar-up',{
         time:1000
     });
     isGameOver = false;
     isBlack = true;
     hasPiece = 0;
-	var data = "type=0#first=0#color=-1#x=-1#y=-1#level=0#timestamp=" + timestamp;
+    var pve_color;
+    if(humanColor === "white")
+        pve_color = 1;
+    else
+        pve_color = 2;
+    var data = "type=3#first=1#color="+ pve_color + "#x=-1#y=-1#level=0#timestamp=" + timestamp;
 	sw_pve_xmlhttp_send(data);
 }
 
@@ -414,9 +430,15 @@ function revoke() {
     for (var i = 0; i < 15; i++) {
         for (var j = 0; j < 15; j++) {
             if (llastCbArray[i][j] === 1) {
-                ctxOfMain.drawImage(black, j * 36 + 18, i * 36 + 18);
+                //ctxOfMain.drawImage(black, j * 36 + 18, i * 36 + 18);
+                preImage(black.src, function(){
+                    ctxOfMain.drawImage(this, col * 36 + 18, row * 36 + 18 );
+                });
             } else if (llastCbArray[i][j] === 2) {
-                ctxOfMain.drawImage(white, j * 36 + 18, i * 36 + 18);
+                //ctxOfMain.drawImage(white, j * 36 + 18, i * 36 + 18);
+                preImage(white.src, function(){
+                    ctxOfMain.drawImage(this, col * 36 + 18, row * 36 + 18 );
+                });
             }
         }
     }
@@ -498,6 +520,7 @@ function about() {
     });
 }
 
+/*js传给C*/
 function sw_pve_xmlhttp_send(data) {
     console.log(data);
     var cgi = "/cgi-bin/gobang";
@@ -520,6 +543,7 @@ function sw_pve_xmlhttp_send(data) {
     xmlhttp.send(data);
 }
 
+/*C传给js*/
 function sw_pve_xmlhttp_callback() {
     //判断对象状态是交互完成，接收服务器返回的数据
     if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
