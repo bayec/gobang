@@ -18,6 +18,13 @@
         </div>
     </div>
     <div class="layui-form-item">
+        <label class="layui-form-label" style="font-size: 18px">难易程度</label>
+        <div class="layui-input-block">
+            <input type="radio" name="level" value="easy" title="容易">
+            <input type="radio" name="level" value="hard" title="困难" checked>
+        </div>
+    </div>
+    <div class="layui-form-item">
         <div class="layui-input-block">
             <button class="layui-btn" lay-submit lay-filter="*" onclick="startGame()">确定</button>
         </div>
@@ -35,19 +42,30 @@
         var index = parent.layer.getFrameIndex(window.name);
         parent.layer.close(index);
 
-        var radio = document.getElementsByName("color");
-        var tmp = null;
-        for(var i = 0; i < radio.length; i++){
-            if(radio[i].checked){
-                if( radio[i].value === "black" ){
-                    tmp = "black";
+        var color = null, level = null;
+        var radioColor = document.getElementsByName("color");
+        var radioLevel = document.getElementsByName("level");
+        for(var i = 0; i < radioColor.length; i++){
+            if(radioColor[i].checked){
+                if( radioColor[i].value === "black" ){
+                    color = "black";
                 }else {
-                    tmp = "white";
+                    color = "white";
                 }
             }
         }
 
-        window.open("game.html?gamemode=pve&color=" + tmp, "_parent");
+        for(var j = 0; j < radioLevel.length; j++){
+            if(radioLevel[j].checked){
+                if( radioLevel[j].value === "easy" ){
+                    level = "easy";
+                }else {
+                    level = "hard";
+                }
+            }
+        }
+
+        window.open("game.html?gamemode=pve&color=" + color + "&level=" + level, "_parent");
     }
 
 </script>
