@@ -165,15 +165,6 @@ function drawChessboard(ctxOfMain) {
 canvasOfMain.onclick = function click(e) {
     console.log("鼠标点击的坐标(" + e.clientX + "," + e.clientY + ")");
 
-    var oDiv = document.createElement('div');
-    oDiv.style.left = e.clientX + 18 + 'px';  // 指定创建的DIV在文档中距离左侧的位置
-    oDiv.style.top = e.clientY - 18 + 'px';  // 指定创建的DIV在文档中距离顶部的位置
-    oDiv.style.position = 'absolute'; // 为新创建的DIV指定绝对定位
-    /*oDiv.style.width = '1px'; // 指定宽度
-    oDiv.style.height = '1px'; // 指定高度*/
-    oDiv.id = "wocaonima";
-    document.body.appendChild(oDiv);
-
     if (isGameOver === false) {
         //获取棋盘相对外边框左边和顶边的偏移量，即确定棋盘左上角那个点的坐标
         var l = this.offsetLeft + 36;
@@ -231,12 +222,6 @@ function drop(row, col, operator) {
             //ctxOfMain.drawImage(black, col * 36 + 18, row * 36 + 18);   //直接drawImage可能失效，用下面的方法预加载
             preImage(black.src, function () {
                 ctxOfMain.drawImage(this, col * 36 + 18, row * 36 + 18);
-                layer.tips('下这里了', '#wocaonima', {
-                    time: 1000,
-                    tips: [2, '#000000']
-                });
-                var child=document.getElementById("wocaonima");
-                child.parentNode.removeChild(child);
             });
             document.getElementById("statusbar-up").style.backgroundImage = "none";
             document.getElementById("statusbar-down").style.backgroundImage = "url(./images/white.png)";
@@ -280,12 +265,6 @@ function drop(row, col, operator) {
             //ctxOfMain.drawImage(white, col * 36 + 18, row * 36 + 18);
             preImage(white.src, function () {
                 ctxOfMain.drawImage(this, col * 36 + 18, row * 36 + 18);
-                layer.tips('下这里了', '#wocaonima', {
-                    time: 1000,
-                    tips: [2, '#000000']
-                });
-                var child=document.getElementById("wocaonima");
-                child.parentNode.removeChild(child);
             });
             document.getElementById("statusbar-down").style.backgroundImage = "none";
             document.getElementById("statusbar-up").style.backgroundImage = "url(./images/black.png)";
@@ -714,7 +693,7 @@ function sw_pve_xmlhttp_callback() {
             return;
         }
         var pos = xmlhttp.responseText.split("#");
-        console.log("Computer setp x=" + pos[0] + ",y=" + pos[1]);
+        console.log("Computer step x=" + pos[0] + ",y=" + pos[1]);
         drop(parseInt(pos[1]), parseInt(pos[0]), "Computer");
     }
     else
