@@ -137,12 +137,12 @@ html,body{
 .gamemode{
     position: absolute;
     top: 9%;
-    left: 7%;
+    left: 9.5%;
 }
 
 .player-up,.player-down,.statusbar{
     position: absolute;
-    left: 7%;
+    left: 10%;
     display: block;
     -webkit-transform: translateY(-50%);
     transform: translateY(-50%);
@@ -162,7 +162,7 @@ html,body{
 .statusbar-up{
     position: absolute;
     top: 35%;
-    left: 9.5%;
+    left: 12.5%;
     width: 36px;
     height: 36px;
 }
@@ -170,7 +170,7 @@ html,body{
 .statusbar-down{
     position: absolute;
     top: 60%;
-    left: 9.5%;
+    left: 12.5%;
     width: 36px;
     height: 36px;
 }
