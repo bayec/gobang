@@ -24,7 +24,8 @@ var gameLevel = 0;   //游戏难度，1是容易，2是困难
 var isBlack = true; //当前棋子是否为黑色
 var isGameOver = false; //当前局是否结束
 var hasPiece = 0; //当前棋盘有几颗棋子
-var revokeFlag = 0;    //悔棋标志位，大于等于2才能悔棋
+var revokeFlag = false;    //悔棋标志位
+var revokeCount = 0;	//悔棋次数
 var pveState = 0;   //人机大战状态
 var xmlhttp = null; //xml的http请求
 var timestamp = null;   //时间戳，作为每一台客户端的标识
@@ -225,19 +226,22 @@ function preImage(url, callback) {
 function drop(row, col, operator) {
     /*将上个棋子的图片十字架去掉*/
     if( isBlack ){
-        if( hasPiece >= 2){
+        if( hasPiece >= 1 && revokeFlag === false ){
             preImage(white_pre.src, function () {
                 ctxOfMain.drawImage(this, preCol * 36 + 18, preRow * 36 + 18);
             });
         }
     }else{
-        preImage(black_pre.src, function () {
-            ctxOfMain.drawImage(this, preCol * 36 + 18, preRow * 36 + 18);
-        });
+        if( hasPiece >= 1 && revokeFlag === false ){
+			preImage(black_pre.src, function () {
+				ctxOfMain.drawImage(this, preCol * 36 + 18, preRow * 36 + 18);
+			});
+		}
     }
 
     if (curCbArray[row][col] === 0) {
         if (isBlack) {//下黑子
+			revokeFlag = false;
             hasPiece++;
             preRow = row;
             preCol = col;
@@ -262,8 +266,8 @@ function drop(row, col, operator) {
                 });
             }
             isBlack = false;
-            revokeFlag++;
-            if (revokeFlag >= 2) {
+            revokeCount++;
+            if (revokeCount >= 2) {
                 var button_revoke1 = document.getElementById('revoke');
                 button_revoke1.setAttribute("class", "layui-btn layui-btn-radius layui-btn-primary");
                 button_revoke1.disabled = false;
@@ -285,6 +289,7 @@ function drop(row, col, operator) {
             }
         } else {
             hasPiece++;
+			revokeFlag = false;
             preRow = row;
             preCol = col;
             //ctxOfMain.drawImage(white, col * 36 + 18, row * 36 + 18);
@@ -308,8 +313,8 @@ function drop(row, col, operator) {
                 });
             }
             isBlack = true;
-            revokeFlag++;
-            if (revokeFlag >= 2) {
+            revokeCount++;
+            if (revokeCount >= 2) {
                 var button_revoke2 = document.getElementById('revoke');
                 button_revoke2.setAttribute("class", "layui-btn layui-btn-radius layui-btn-primary");
                 button_revoke2.disabled = false;
@@ -572,6 +577,7 @@ function restart() {
     }
     isGameOver = false;
     isBlack = true;
+	revokeFlag = false;
     hasPiece = 0;
     preRow = 0;
     preCol = 0;
@@ -586,6 +592,7 @@ function restart() {
 
 /*悔棋*/
 function revoke() {
+	revokeFlag = true;
     //重新画棋盘
     ctxOfMain.clearRect(0, 0, 640, 640);
     drawChessboard(ctxOfMain);
@@ -620,7 +627,7 @@ function revoke() {
         hasPiece -= 2;
     }
 
-    revokeFlag = 0;
+    revokeCount = 0;
 
     /*悔棋按一次后禁止再按，因为只能悔一步，需要等悔完以后再下两步使能按钮*/
     var button = document.getElementById('revoke');
