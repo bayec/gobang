@@ -20,14 +20,14 @@ white.src = "images/white.png";
 /*棋盘状态标志位*/
 var gameMode = null;   //当前游戏模式
 var humanColor = null; //用户棋子颜色
-var whoDrop = null; //当前谁走
+var gameLevel = 0;   //游戏难度，1是容易，2是困难
 var isBlack = true; //当前棋子是否为黑色
 var isGameOver = false; //当前局是否结束
 var hasPiece = 0; //当前棋盘有几颗棋子
 var revokeFlag = 0;    //悔棋标志位，大于等于2才能悔棋
 var pveState = 0;   //人机大战状态
 var xmlhttp = null; //xml的http请求
-var timestamp = null;
+var timestamp = null;   //时间戳，作为每一台客户端的标识
 
 /*canvas初始化*/
 var canvasOfMain = document.getElementById('chessboard');
@@ -106,12 +106,13 @@ function setGameMode() {
 function pveInit() {
     var para = new GetUrlPara();
     humanColor = para.color;
+    gameLevel = para.level === "easy" ? 1 : 2;
 	timestamp=new Date().getTime();
     if( humanColor === "white" )
     {
         console.log("Computer is black.");
         //type=0#first=0#color=1#x=-1#y=0#level=0#timestamp=12345678
-		var cmd = "type=1#first=1#color=1#x=-1#y=-1#level=0#timestamp=" + timestamp;
+		var cmd = "type=1#first=1#color=1#x=-1#y=-1#level="+ gameLevel + "#timestamp=" + timestamp;
         sw_pve_xmlhttp_send(cmd);
     }
     pveState = 1;
@@ -266,7 +267,7 @@ function drop(row, col, operator) {
             if(operator === "Human" && pveState === 1 && isGameOver === false )
             {
                 //type=0#first=0#color=1#x=-1#y=0#level=0#timestamp=12345678
-				var data1 = "type=1#first=0#color=1#x="+ col + "#y=" + row + "#level=0#timestamp=" + timestamp;
+				var data1 = "type=1#first=0#color=1#x="+ col + "#y=" + row + "#level=" + gameLevel + "#timestamp=" + timestamp;
                 sw_pve_xmlhttp_send(data1);
             }
         } else {
@@ -310,7 +311,7 @@ function drop(row, col, operator) {
             check(2, row, col);
             if(operator === "Human" && pveState === 1 && isGameOver === false )
             {
-				var data2 = "type=1#first=0#color=2#x="+ col + "#y=" + row + "#level=0#timestamp=" + timestamp;
+				var data2 = "type=1#first=0#color=2#x="+ col + "#y=" + row + "#level=" + gameLevel + "#timestamp=" + timestamp;
                 sw_pve_xmlhttp_send(data2);
             }
         }
@@ -497,7 +498,7 @@ function check(color, row, col) {
 			if(pveState === 1)
 			{
 				console.log("Reset cgi board.");
-				var data = "type=0#first=0#color=0#x=-1#y=-1#level=0#timestamp=" + timestamp;
+				var data = "type=0#first=0#color=0#x=-1#y=-1#level=" + gameLevel + "#timestamp=" + timestamp;
 				sw_pve_xmlhttp_send(data);
 			}
         }
@@ -566,7 +567,7 @@ function restart() {
         pve_color = 1;
     else
         pve_color = 2;
-    var data = "type=3#first=1#color="+ pve_color + "#x=-1#y=-1#level=0#timestamp=" + timestamp;
+    var data = "type=3#first=1#color="+ pve_color + "#x=-1#y=-1#level=" + gameLevel + "#timestamp=" + timestamp;
 	sw_pve_xmlhttp_send(data);
 }
 
@@ -613,7 +614,7 @@ function revoke() {
     button.setAttribute("class", "layui-btn layui-btn-radius layui-btn-disabled");
     button.disabled = true;
     if( pveState === 1 ){
-        var data = "type=2#first=0#color="+ humanColor + "#x=-1#y=-1#level=0#timestamp=" + timestamp;
+        var data = "type=2#first=0#color="+ humanColor + "#x=-1#y=-1#level=" + gameLevel + "#timestamp=" + timestamp;
         sw_pve_xmlhttp_send(data);
     }
 }
@@ -635,7 +636,7 @@ function giveup() {
     var buttonGiveup = document.getElementById('giveup');
     buttonGiveup.setAttribute("class", "layui-btn layui-btn-radius layui-btn-disabled");
     buttonGiveup.disabled = true;
-	var data = "type=0#first=0#color=0#x=-1#y=-1#level=0#timestamp=" + timestamp;
+	var data = "type=0#first=0#color=0#x=-1#y=-1#level=" + gameLevel + "#timestamp=" + timestamp;
 	sw_pve_xmlhttp_send(data);
 }
 
@@ -643,7 +644,7 @@ function giveup() {
 function gohomepage()
 {
 	console.log("gohomepage");
-	var data = "type=0#first=0#color=0#x=-1#y=-1#level=0#timestamp=" + timestamp;
+	var data = "type=0#first=0#color=0#x=-1#y=-1#level=" + gameLevel + "#timestamp=" + timestamp;
 	sw_pve_xmlhttp_send(data);
 	self.location = "index.html";
 
