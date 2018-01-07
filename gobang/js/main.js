@@ -490,8 +490,8 @@ function check(color, row, col) {
 
     //重置当前棋子的坐标和连子数
     function reset() {
-        rowBak = row;
-        colBak = col;
+        row = rowBak;
+        col = colBak;
         total = 1;
     }
 }
