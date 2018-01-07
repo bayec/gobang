@@ -8,10 +8,14 @@ var prePreCbArray = arrayInit(15);  //定义一个二维数组，保存前两次
 
 
 /*棋子初始化*/
-var black = new Image();
-var white = new Image();
-black.src = "images/black.png";
-white.src = "images/white.png";
+var black_pre = new Image();    //上一个黑色棋子
+var black_cur = new Image();    //当前黑色棋子
+var white_pre = new Image();    //上一个白色棋子
+var white_cur = new Image();    //当前白色棋子
+black_pre.src = "images/black_pre.png";
+black_cur.src = "images/black_cur.png";
+white_pre.src = "images/white_pre.png";
+white_cur.src = "images/white_cur.png";
 
 /*棋盘状态标志位*/
 var gameMode = null;   //当前游戏模式
@@ -24,6 +28,8 @@ var revokeFlag = 0;    //悔棋标志位，大于等于2才能悔棋
 var pveState = 0;   //人机大战状态
 var xmlhttp = null; //xml的http请求
 var timestamp = null;   //时间戳，作为每一台客户端的标识
+var preRow = 0; //上一个棋子横坐标
+var preCol = 0; //上一个棋子纵坐标
 
 /*canvas初始化*/
 var canvasOfMain = document.getElementById('chessboard');
@@ -41,7 +47,7 @@ function gameInit() {
     drawChessboard(ctxOfMain);  //画棋盘
 
     /*设置棋子状态框*/
-    document.getElementById("statusbar-up").style.backgroundImage = "url(./images/black.png)";
+    document.getElementById("statusbar-up").style.backgroundImage = "url(./images/black_pre.png)";
 
     /*设置头像框和提示语*/
     if (gameMode === "pve" && humanColor === "black") {
@@ -217,14 +223,30 @@ function preImage(url, callback) {
 
 /*落子*/
 function drop(row, col, operator) {
+    /*将上个棋子的图片十字架去掉*/
+    if( isBlack ){
+        if( hasPiece >= 2){
+            preImage(white_pre.src, function () {
+                ctxOfMain.drawImage(this, preCol * 36 + 18, preRow * 36 + 18);
+            });
+        }
+    }else{
+        preImage(black_pre.src, function () {
+            ctxOfMain.drawImage(this, preCol * 36 + 18, preRow * 36 + 18);
+        });
+    }
+
     if (curCbArray[row][col] === 0) {
         if (isBlack) {//下黑子
+            hasPiece++;
+            preRow = row;
+            preCol = col;
             //ctxOfMain.drawImage(black, col * 36 + 18, row * 36 + 18);   //直接drawImage可能失效，用下面的方法预加载
-            preImage(black.src, function () {
+            preImage(black_cur.src, function () {
                 ctxOfMain.drawImage(this, col * 36 + 18, row * 36 + 18);
             });
             document.getElementById("statusbar-up").style.backgroundImage = "none";
-            document.getElementById("statusbar-down").style.backgroundImage = "url(./images/white.png)";
+            document.getElementById("statusbar-down").style.backgroundImage = "url(./images/white_pre.png)";
             /*设置提示语*/
             if (gameMode === "pve" && humanColor === "black") {
                 layer.tips('轮到你了，机器人！', '#player-up', {
@@ -240,7 +262,6 @@ function drop(row, col, operator) {
                 });
             }
             isBlack = false;
-            hasPiece++;
             revokeFlag++;
             if (revokeFlag >= 2) {
                 var button_revoke1 = document.getElementById('revoke');
@@ -255,6 +276,7 @@ function drop(row, col, operator) {
             arrayCopy(prePreCbArray, preCbArray);
             arrayCopy(preCbArray, curCbArray);
             curCbArray[row][col] = 1; //黑子为1
+
             check(1, row, col);
             if (operator === "Human" && pveState === 1 && isGameOver === false) {
                 //type=0#first=0#color=1#x=-1#y=0#level=0#timestamp=12345678
@@ -262,12 +284,15 @@ function drop(row, col, operator) {
                 sw_pve_xmlhttp_send(data1);
             }
         } else {
+            hasPiece++;
+            preRow = row;
+            preCol = col;
             //ctxOfMain.drawImage(white, col * 36 + 18, row * 36 + 18);
-            preImage(white.src, function () {
+            preImage(white_cur.src, function () {
                 ctxOfMain.drawImage(this, col * 36 + 18, row * 36 + 18);
             });
             document.getElementById("statusbar-down").style.backgroundImage = "none";
-            document.getElementById("statusbar-up").style.backgroundImage = "url(./images/black.png)";
+            document.getElementById("statusbar-up").style.backgroundImage = "url(./images/black_pre.png)";
             /*设置提示语*/
             if (gameMode === "pve" && humanColor === "black") {
                 layer.tips('该你了，愚蠢的人类!', '#player-down', {
@@ -283,7 +308,6 @@ function drop(row, col, operator) {
                 });
             }
             isBlack = true;
-            hasPiece++;
             revokeFlag++;
             if (revokeFlag >= 2) {
                 var button_revoke2 = document.getElementById('revoke');
@@ -298,6 +322,7 @@ function drop(row, col, operator) {
             arrayCopy(prePreCbArray, preCbArray);
             arrayCopy(preCbArray, curCbArray);
             curCbArray[row][col] = 2; //白子为2
+
             check(2, row, col);
             if (operator === "Human" && pveState === 1 && isGameOver === false) {
                 var data2 = "type=1#first=0#color=2#x=" + col + "#y=" + row + "#level=" + gameLevel + "#timestamp=" + timestamp;
@@ -529,7 +554,7 @@ function restart() {
     buttonGiveup.disabled = true;
 
     // ctxOfStatusBar.clearRect(0, 0, canvasOfStatusBar[0].width, canvasOfStatusBar[0].height);
-    document.getElementById("statusbar-up").style.backgroundImage = "url(./images/black.png)";
+    document.getElementById("statusbar-up").style.backgroundImage = "url(./images/black_pre.png)";
     document.getElementById("statusbar-down").style.backgroundImage = "none";
     /*设置头像框和提示语*/
     if (gameMode === "pve" && humanColor === "black") {
@@ -548,8 +573,10 @@ function restart() {
     isGameOver = false;
     isBlack = true;
     hasPiece = 0;
+    preRow = 0;
+    preCol = 0;
     var pve_color;
-    if (humanColor === "white")
+    if ( humanColor === "white" )
         pve_color = 1;
     else
         pve_color = 2;
@@ -568,12 +595,12 @@ function revoke() {
         for (var j = 0; j < 15; j++) {
             if (prePreCbArray[i][j] === 1) {
                 //ctxOfMain.drawImage(black, j * 36 + 18, i * 36 + 18);
-                preImage(black.src, function () {
+                preImage(black_pre.src, function () {
                     ctxOfMain.drawImage(this, j * 36 + 18, i * 36 + 18);
                 });
             } else if (prePreCbArray[i][j] === 2) {
                 //ctxOfMain.drawImage(white, j * 36 + 18, i * 36 + 18);
-                preImage(white.src, function () {
+                preImage(white_pre.src, function () {
                     ctxOfMain.drawImage(this, j * 36 + 18, i * 36 + 18);
                 });
             }
