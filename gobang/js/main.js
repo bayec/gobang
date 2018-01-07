@@ -325,21 +325,36 @@ function drop(row, col, operator) {
 function check(color, row, col) {
     if( hasPiece >= 225 ){
         isGameOver = true;
-        /*if( gameMode === "pve" && humanColor === "black" )
+        if( gameMode === "pve" && humanColor === "black" )
         {
-            layer.tips('该你了，愚蠢的人类!', '#player-down',{
-                time:2000
+            layer.tips('平了!', '#player-up',{
+                time:2000,
+                tipsMore:true
+            });
+            layer.tips('哼，竟然是平局，再来!', '#player-down',{
+                time:2000,
+                tipsMore:true
             });
         }else if( gameMode === "pve" && humanColor === "white" ){
-            layer.tips('轮到你了，机器人!', '#player-down',{
-                time:2000
+            layer.tips('哼，竟然是平局，再来!', '#player-up',{
+                time:2000,
+                tipsMore:true
+            });
+            layer.tips('平了!', '#player-down',{
+                time:2000,
+                tipsMore:true
             });
         }else if( gameMode === "pvp" ){
-            layer.tips('轮到你了，亲爱的!', '#player-down',{
-                time:2000
+            layer.tips('宝贝，再来一局吧!', '#player-up',{
+                time:2000,
+                tipsMore:true
             });
-        }*/
-        layer.msg("和棋");
+            layer.tips('亲爱的，平局哦!', '#player-down',{
+                time:2000,
+                tipsMore:true
+            });
+        }
+        layer.msg("和棋!");
     }
 
     var rowBak = row, colBak = col, total = 1;
