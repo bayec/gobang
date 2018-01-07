@@ -3,8 +3,6 @@ OBJ += gobang.o
 TARGET = gobang
 
 CFLAGS = -Wall
-CFLAGS += -lpthread
-CFLAGS += -static
 
 $(TARGET):$(OBJ)  
 	$(CC) $^ -o $@ $(CFLAGS) 
