@@ -263,7 +263,7 @@ function drop(row, col, operator) {
             arrayCopy(preCbArray, curCbArray);
             curCbArray[row][col] = 1; //黑子为1
             check(1, row, col);
-            if(operator === "Human" && pveState === 1)
+            if(operator === "Human" && pveState === 1 && isGameOver === false )
             {
                 //type=0#first=0#color=1#x=-1#y=0#level=0#timestamp=12345678
 				var data1 = "type=1#first=0#color=1#x="+ col + "#y=" + row + "#level=0#timestamp=" + timestamp;
@@ -308,7 +308,7 @@ function drop(row, col, operator) {
             arrayCopy(preCbArray, curCbArray);
             curCbArray[row][col] = 2; //白子为2
             check(2, row, col);
-            if(operator === "Human" && pveState === 1)
+            if(operator === "Human" && pveState === 1 && isGameOver === false )
             {
 				var data2 = "type=1#first=0#color=2#x="+ col + "#y=" + row + "#level=0#timestamp=" + timestamp;
                 sw_pve_xmlhttp_send(data2);
@@ -673,6 +673,45 @@ function about() {
         content: ['about.html', 'no']
     });
 }
+
+/*棋子预览效果*/
+/*canvasOfMain.onmouseover = function mouseover(e) {
+    console.log("鼠标当前坐标(" + e.clientX + "," + e.clientY + ")");
+
+    if (isGameOver === false) {
+        //获取棋盘相对外边框左边和顶边的偏移量，即确定棋盘左上角那个点的坐标
+        var l = this.offsetLeft + 36;
+        var t = this.offsetTop + 36;
+
+        //获取点击的位置相对棋盘左上角那个点的坐标的偏移量
+        var x = e.clientX - l;
+        var y = e.clientY - t;
+
+        var row = 0, col = 0;
+
+        //确定棋子二维数组坐标，左上角为(0,0)，右下角为(14,14)
+        if (x > 0) {
+            if (x % 36 < 18) {
+                row = parseInt(x / 36);
+            } else {
+                row = parseInt(x / 36) + 1;
+            }
+        }
+
+        if (y > 0) {
+            if (y % 36 < 18) {
+                col = parseInt(y / 36);
+            } else {
+                col = parseInt(y / 36) + 1;
+            }
+        }
+
+        console.log("棋盘坐标(" + row + "," + col + ")");
+        drop(col, row, "Human"); //棋盘横竖和二维数组的行列需要反一下
+    } else {
+
+    }
+};*/
 
 /*js传给C*/
 function sw_pve_xmlhttp_send(data) {
