@@ -31,6 +31,16 @@ enum MSG_TYPE{
 	REVORK,
 	RESTART,
 };
+enum GOAL{
+	LIVE_ONE  = 3,
+	TO_TWO	  =	5,
+	LIVE_TWO  = 45,
+	TO_THREE  = 30,
+	LIVE_THR  = 460,
+	TO_FOUR   = 900,
+	LIVE_FOUR = 3000,
+	TO_FIVE   = 10000,
+};
 int m_type = 0;
 int m_is_first = 0;
 int m_color; //1为黑棋，2为白棋 
@@ -45,7 +55,6 @@ typedef struct node
 }POINT;
 vector<vector<int> > board;
 //五子棋游戏类，进行游戏相关的操作
-
 class Game
 {
 	private:
@@ -61,12 +70,10 @@ class Game
 
 	private://核心算法模块
 
-		//算法2
 		void Way(POINT & ps);
 		void SetScore(const int i, const int j, const int Who,
 				vector<vector<int> > & State); //评分函数
 		int p_Score(int num, int bp[]); //实际的评分函数
-		bool first; //是否是第一步
 };
 
 Game::Game()
@@ -86,7 +93,6 @@ void Game::Init(void)
 	{
 		board.push_back(temp);
 	}
-	first = true; //是否是第一步，算法二要用
 }
 
 void Game::Run(POINT & ps)
@@ -98,7 +104,7 @@ void Game::Run(POINT & ps)
 //只考虑当前情况，不递归的（贪心法)
 void Game::Way(POINT & ps)
 {
-	int i,j;
+	int i = 0, j = 0;
 	vector<vector<int> > HumanState, ComputerState;
 	vector<int> temp(N, 0);
 	int maxP = 0, maxC = 0; //计算机和人状态值的最大值
@@ -124,12 +130,11 @@ void Game::Way(POINT & ps)
 		{
 			if (board[i][j] == 0)
 			{
-				SetScore(i, j, m_color, HumanState);
+				SetScore(i, j, m_color, HumanState); //这个的第三个参数是指who
 				SetScore(i, j, 3 - m_color, ComputerState);
 			}
 		}
 	}
-
 
 	for (i = 0; i < N; i++)
 	{
@@ -149,15 +154,31 @@ void Game::Way(POINT & ps)
 			}
 		}
 	}
-	if (maxP >= maxC)
+	if(m_level == 2)
 	{
-		ps.x = ps1.x;
-		ps.y = ps1.y;
+		if (maxP >= maxC)
+		{
+			ps.x = ps1.x;
+			ps.y = ps1.y;
+		}
+		else
+		{
+			ps.x = ps2.x;
+			ps.y = ps2.y;
+		}
 	}
 	else
 	{
-		ps.x = ps2.x;
-		ps.y = ps2.y;
+		if(maxP >= maxC && maxP >= LIVE_FOUR) //人活三子，必须堵住
+		{
+			ps.x = ps1.x;
+			ps.y = ps1.y;
+		}
+		else
+		{
+			ps.x = ps2.x;
+			ps.y = ps2.y;
+		}
 	}
 	X=ps.x;
 	Y=ps.y;
@@ -167,7 +188,8 @@ void Game::Way(POINT & ps)
 void Game::SetScore(const int i, const int j, const int Who,
 		vector<vector<int> > & State)
 {
-	int Another; //与要求的状态相对的另一方
+	int Another; 
+
 	int bp[2], k, num, max = 0, temp = 0;
 	if (Who == 1)
 	{
@@ -182,19 +204,18 @@ void Game::SetScore(const int i, const int j, const int Who,
 		return;
 	}
 
-
 	//横向
 	//向右
 	bp[0] = 1; bp[1] = 1;
 	num = 0;
 	for (k = 1; k < N - i; k++)
 	{
-		if (board[i+k][j] == Who)
+		if (board[i+k][j] == Who) 
 		{
 			num++;
 			continue;
 		}
-		if (board[i+k][j] == 0)
+		if (board[i+k][j] == 0) 
 		{
 			bp[1] = 0;
 			break;
@@ -206,7 +227,7 @@ void Game::SetScore(const int i, const int j, const int Who,
 		}
 	}
 	//向左
-	for (k = 1; k <= i; k++)
+	for (k = 1; k <= i; k++) //横向左侧
 	{
 		if (board[i-k][j] == Who)
 		{
@@ -225,7 +246,7 @@ void Game::SetScore(const int i, const int j, const int Who,
 		}
 	}
 	//调用评分函数
-	temp = p_Score(num, bp);
+	temp = p_Score(num, bp); //num为两侧己方棋子数，bp则为统计两侧的棋子状态
 	max += temp;
 
 	//纵向
@@ -277,7 +298,7 @@ void Game::SetScore(const int i, const int j, const int Who,
 	num = 0;
 
 	//下
-	for (k = 1; k < N-i && k < N-j; k++)
+	for (k = 1; k < N - i && k < N - j; k++)
 	{
 		if (board[i+k][j+k] == Who)
 		{
@@ -321,7 +342,7 @@ void Game::SetScore(const int i, const int j, const int Who,
 	bp[0] = 1; bp[1] = 1;
 	num = 0;
 	//下
-	for (k = 1; k < N-j && k <= i; k++)
+	for (k = 1; k < N - j && k <= i; k++)
 	{
 		if (board[i-k][j+k] == Who)
 		{
@@ -340,7 +361,7 @@ void Game::SetScore(const int i, const int j, const int Who,
 		}
 	}
 	//上
-	for (k = 1; k <= j && k < N-i; k++)
+	for (k = 1; k <= j && k < N - i; k++)
 	{
 		if (board[i+k][j-k] == Who)
 		{
@@ -373,7 +394,7 @@ int Game::p_Score(int num, int bp[])
 	int max = 0;
 	if (num >= 4)
 	{
-		max += 10000; //成五
+		max += TO_FIVE; //成五
 	}
 	else if (num == 3)
 	{
@@ -383,33 +404,33 @@ int Game::p_Score(int num, int bp[])
 		}
 		else if (bp[1] == 0 && bp[0] == 0) //活四
 		{
-			max += 3000;
+			max += LIVE_FOUR;
 		}
 		else
 		{
-			max += 900; //冲四
+			max += TO_FOUR; //冲四
 		}
 	}
 	else if (num == 2)
 	{
 		if (bp[0] == 0 && bp[1] == 0)
 		{
-			max += 460; //活三
+			max += LIVE_THR; //活三
 		}
 		else if (bp[0] == 1 && bp[1] == 1)
 		{
-			max += 0; //不成五
+			max += 0; //死三
 		}
 		else
 		{
-			max += 30; //死三
+			max += TO_THREE; //冲三
 		}
 	}
 	else if (num == 1)
 	{
 		if (bp[0] == 0 && bp[1] == 0)
 		{
-			max += 45;  //活二
+			max += LIVE_TWO;  //活二
 		}
 		else if (bp[0] == 1 && bp[1] == 1)
 		{
@@ -417,7 +438,7 @@ int Game::p_Score(int num, int bp[])
 		}
 		else
 		{
-			max += 5;
+			max += TO_TWO;
 		}
 	}
 	else if (num == 0)
@@ -439,7 +460,7 @@ int Game::p_Score(int num, int bp[])
 }
 
 
-static void send_pos_msg_to_js(char* pos_info)
+static void sw_send_pos_msg_to_js(char* pos_info)
 {
 	if(pos_info)
 	{
@@ -455,6 +476,7 @@ static void save_board_to_file()
 	char pre_file[256] = {0};
 	char pre_pre_file[256] = {0};
 	char cmd[128] = {0};
+	memset(&stat_info, 0, sizeof(stat_info));
 	snprintf(pre_file, sizeof(pre_file), "%s.pre", m_timestamp);
 	snprintf(pre_pre_file, sizeof(pre_pre_file), "%s.pre.pre", m_timestamp);
 	if (lstat(m_timestamp, &stat_info) == 0 && (!S_ISDIR(stat_info.st_mode)))
@@ -487,11 +509,11 @@ static void save_board_to_file()
 	fwrite(data, len, 1, fp);
 	fclose(fp);
 	fp = NULL;
-	chmod(m_timestamp, 0777);
+//	chmod(m_timestamp, 0777);
 	return;
 }
 
-static void get_board_from_file()
+static void sw_get_board_from_file()
 {
 	FILE *fp = NULL;
 	char *p = NULL;
@@ -504,7 +526,7 @@ static void get_board_from_file()
 		fp = fopen(m_timestamp,"r+");
 		if(fp == NULL)
 		{
-			send_pos_msg_to_js((char *)"Error");
+			sw_send_pos_msg_to_js((char *)"Error");
 			return;
 		}
 		size = fread(buf, 1, sizeof(buf)-1, fp);
@@ -536,11 +558,11 @@ static void get_board_from_file()
 
 static void sw_get_xy_pos()
 {
-	Game wahaha;
-	wahaha.Init();
+	Game gobang;
+	gobang.Init();
 
 	POINT ps; //棋盘上每个格子的状态,0为啥也没有，1为黑棋，2为白棋
-	get_board_from_file();
+	sw_get_board_from_file();
 
 	if(m_color == 1 && m_is_first == 1) //如果己方执黑且是第一步，则占据棋盘中心位置 黑棋为1，白棋为2 
 	{ 
@@ -550,8 +572,8 @@ static void sw_get_xy_pos()
 		board[N / 2][N / 2] = 1; //更新棋盘信息
 		char msg[16] = {0};
 		snprintf(msg, sizeof(msg),"%d#%d", N/2, N/2);
-		send_pos_msg_to_js(msg);
-	//	send_pos_msg_to_js((char *)"Reset OK");
+		sw_send_pos_msg_to_js(msg);
+	//	sw_send_pos_msg_to_js((char *)"Reset OK");
 	}
 	else 
 	{
@@ -559,13 +581,13 @@ static void sw_get_xy_pos()
 		//更新棋盘信息 
 		do
 		{ 
-			wahaha.Run(ps);
+			gobang.Run(ps);
 			if (board[X][Y] == 0) //如果该位置为空则占据该位置 
 			{
 				board[X][Y] = m_color; //更新棋盘信息 
 				char msg[16] = {0};
 				snprintf(msg, sizeof(msg),"%d#%d", X, Y);
-				send_pos_msg_to_js(msg);
+				sw_send_pos_msg_to_js(msg);
 				break; //结束循环 
 			}
 		}
@@ -573,10 +595,10 @@ static void sw_get_xy_pos()
 		//循环直至随机得到一个空位置 
 	}
 	save_board_to_file();
-	wahaha.~Game();
+	gobang.~Game();
 }
 
-static void restart_board_data()
+static void sw_restart_board_data()
 {
 	int len = 0;
 	FILE *fp = NULL;
@@ -594,11 +616,11 @@ static void restart_board_data()
 	if(m_color == 1)
 		sw_get_xy_pos();
 	else
-		send_pos_msg_to_js((char *)"Reset OK");
+		sw_send_pos_msg_to_js((char *)"Reset OK");
 	return;
 }
 
-static void reset_board_data()
+static void sw_reset_board_data()
 {
 	int len = 0;
 	FILE *fp = NULL;
@@ -613,11 +635,11 @@ static void reset_board_data()
 	fwrite(data, len, 1, fp);
 	fclose(fp);
 	fp = NULL;
-	send_pos_msg_to_js((char *)"Reset OK");
+	sw_send_pos_msg_to_js((char *)"Reset OK");
 	return;
 }
 
-static void parse_msg_from_js(char *msg, int size)
+static void sw_parse_msg_from_js(char *msg, int size)
 {
 	//strcpy(buf, "type=0#first=0#color=1#x=-1#y=0#level=0");
 	if(msg == NULL || size <= 0)
@@ -663,7 +685,7 @@ static void parse_msg_from_js(char *msg, int size)
 	return;
 }
 
-static void revork_one_step()
+static void sw_revork_one_step()
 {
 	struct stat stat_info;
 	char pre_file[256] = {0};
@@ -688,7 +710,7 @@ static void revork_one_step()
 			snprintf(cmd, sizeof(cmd), "cp %s %s", pre_file, m_timestamp);
 			system(cmd);
 		}
-		send_pos_msg_to_js((char *)"Revork OK");
+		sw_send_pos_msg_to_js((char *)"Revork OK");
 	}
 	return;
 }
@@ -704,21 +726,21 @@ int main()
 	len = atoi(recvbuf);
 	if((len > 0)&&(fgets(buf, len+1, stdin)!=NULL))
 	{
-		parse_msg_from_js(buf, len+1);
+		sw_parse_msg_from_js(buf, len+1);
 //		strcpy(buf, "type=3#first=1#color=1#x=-1#y=-1#level=0#timestamp=1515255533393");
-		parse_msg_from_js(buf, sizeof(buf));
+//		parse_msg_from_js(buf, sizeof(buf));
 		switch (m_type){
 			case RESET: 
-				reset_board_data();
+				sw_reset_board_data();
 				break;
 			case RUN:
 				sw_get_xy_pos();
 				break;
 			case REVORK: //悔棋
-				revork_one_step();
+				sw_revork_one_step();
 				break;
 			case RESTART:
-				restart_board_data();
+				sw_restart_board_data();
 				break;
 			default:
 				break;
