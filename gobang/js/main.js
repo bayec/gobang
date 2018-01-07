@@ -674,7 +674,7 @@ function help() {
     layer.open({
         type: 2,
         title: ['游戏帮助', 'font-size:20px;'],
-        area: ['800px', '300px'],
+        area: ['800px', '400px'],
         shade: 0.8,
         closeBtn: 1,
         anim: 1,
