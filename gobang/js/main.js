@@ -642,8 +642,48 @@ function revoke() {
 /*认输*/
 function giveup() {
     if (isBlack) {
+		if (gameMode === "pvp") {
+			layer.tips('宝贝，你真是美貌与智慧并存！', '#player-up', {
+				time: 3000,
+				tipsMore: true
+			});
+			layer.tips('亲爱的，别灰心！', '#player-down', {
+				time: 3000,
+				tipsMore: true
+			});
+		}
+		if (gameMode === "pve") {
+			layer.tips('哈哈，人类果然愚蠢！', '#player-down', {
+				time: 3000,
+				tipsMore: true
+			});
+			layer.tips('可恶！', '#player-up', {
+				time: 3000,
+				tipsMore: true
+			});
+		}
         layer.msg('黑子认输，白子获胜！');
     } else {
+		if (gameMode === "pvp") {
+			layer.tips('宝贝，再来一局吧！', '#player-up', {
+				time: 3000,
+				tipsMore: true
+			});
+			layer.tips('亲爱的，你真厉害！', '#player-down', {
+				time: 3000,
+				tipsMore: true
+			});
+		}
+		if (gameMode === "pve") {
+			layer.tips('哈哈，人类果然愚蠢！', '#player-up', {
+				time: 3000,
+				tipsMore: true
+			});
+			layer.tips('可恶！', '#player-down', {
+				time: 3000,
+				tipsMore: true
+			});
+		}
         layer.msg('白子认输，黑子获胜！');
     }
     isGameOver = true;
