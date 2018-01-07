@@ -171,24 +171,24 @@ html,body{
 }
 
 .player-up{
-    top: 30%;
+    top: 25%;
     width: 100px;
     height: 100px;
-    border: 1px solid black;
+    /*border: 1px solid black;*/
     /*background: url("../images/black.png");*/
 }
 .player-down{
-    top: 70%;
+    top: 75%;
     width: 100px;
     height: 100px;
-    border: 1px solid black;
+    /*border: 1px solid black;*/
     /*background: url("../images/black.png");*/
 }
 
 .statusbar-up{
     position: absolute;
-    top: 40%;
-    left: 7%;
+    top: 35%;
+    left: 8%;
     width: 36px;
     height: 36px;
     /*border: 1px solid black;*/
@@ -196,8 +196,8 @@ html,body{
 
 .statusbar-down{
     position: absolute;
-    top: 55%;
-    left: 7%;
+    top: 60%;
+    left: 8%;
     width: 36px;
     height: 36px;
     /*border: 1px solid black;*/

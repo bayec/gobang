@@ -451,6 +451,30 @@ static void send_pos_msg_to_js(char* pos_info)
 
 static void save_board_to_file()
 {
+	struct stat stat_info;
+	char pre_file[256] = {0};
+	char pre_pre_file[256] = {0};
+	char cmd[128] = {0};
+	snprintf(pre_file, sizeof(pre_file), "%s.pre", m_timestamp);
+	snprintf(pre_pre_file, sizeof(pre_pre_file), "%s.pre.pre", m_timestamp);
+	if (lstat(m_timestamp, &stat_info) == 0 && (!S_ISDIR(stat_info.st_mode)))
+	{
+		if (lstat(pre_file, &stat_info) == 0 && (!S_ISDIR(stat_info.st_mode)))
+		{
+			memset(cmd, 0, sizeof(cmd));
+			snprintf(cmd, sizeof(cmd), "cp %s %s", pre_file, pre_pre_file);
+			system(cmd);
+			memset(cmd, 0, sizeof(cmd));
+			snprintf(cmd, sizeof(cmd), "cp %s %s", m_timestamp, pre_file);
+			system(cmd);
+		}
+		else
+		{
+			memset(cmd, 0, sizeof(cmd));
+			snprintf(cmd, sizeof(cmd), "cp %s %s", m_timestamp, pre_file);
+			system(cmd);
+		}
+	}
 	FILE *fp = NULL;
 	fp = fopen(m_timestamp,"w+");
 	if(fp == NULL)
@@ -639,6 +663,36 @@ static void parse_msg_from_js(char *msg, int size)
 	return;
 }
 
+static void revork_one_step()
+{
+	struct stat stat_info;
+	char pre_file[256] = {0};
+	char pre_pre_file[256] = {0};
+	char cmd[128] = {0};
+	snprintf(pre_file, sizeof(pre_file), "%s.pre", m_timestamp);
+	snprintf(pre_pre_file, sizeof(pre_pre_file), "%s.pre.pre", m_timestamp);
+	if (lstat(pre_file, &stat_info) == 0 && (!S_ISDIR(stat_info.st_mode)))
+	{
+		if (lstat(pre_pre_file, &stat_info) == 0 && (!S_ISDIR(stat_info.st_mode)))
+		{
+			memset(cmd, 0, sizeof(cmd));
+			snprintf(cmd, sizeof(cmd), "cp %s %s", pre_file, m_timestamp);
+			system(cmd);
+			memset(cmd, 0, sizeof(cmd));
+			snprintf(cmd, sizeof(cmd), "cp %s %s", pre_pre_file, pre_file);
+			system(cmd);
+		}
+		else
+		{
+			memset(cmd, 0, sizeof(cmd));
+			snprintf(cmd, sizeof(cmd), "cp %s %s", pre_file, m_timestamp);
+			system(cmd);
+		}
+		send_pos_msg_to_js((char *)"Revork OK");
+	}
+	return;
+}
+
 int main() 
 { 
 	int len = 0;
@@ -661,6 +715,7 @@ int main()
 				sw_get_xy_pos();
 				break;
 			case REVORK: //悔棋
+				revork_one_step();
 				break;
 			case RESTART:
 				restart_board_data();
